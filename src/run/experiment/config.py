@@ -2,7 +2,9 @@
 Experiment templates and model sizing utilities.
 
 Two experiment templates are provided as factory functions that return
-pre-configured ``ExperimentConfig`` instances
+pre-configured ``ExperimentConfig`` instances (data + run settings). Models are
+declared per stage; ``stories_model`` / ``realistic_model`` build model configs
+matching each template's tokenizer and context length.
 """
 
 from __future__ import annotations
@@ -13,11 +15,9 @@ from pathlib import Path
 from src.run.util.config import (
     ExperimentConfig,
     DataConfig,
-    DataLabelConfig,
     ModelConfig,
-    RunConfig,
 )
-from src.model.utils import find_base_params
+from src.model.utils import calc_base_params
 
 
 # --------------------------------------------------------------------------- #
@@ -27,103 +27,41 @@ from src.model.utils import find_base_params
 root_dir = Path("src").absolute()
 
 def GetStoriesConfig(num_aux: int = 4) -> ExperimentConfig:
-    """Small-scale TinyStories experiment for fast iteration and debugging."""
+    """SimpleStories experiment: the first ``num_aux`` topics (sorted) are aux, the rest core."""
 
     data_dir = root_dir / "data/stories"
     metadata = json.load(open(data_dir / "metadata.json"))
     all_labels = sorted(metadata["all"]["labels"])
-    aux_labels = all_labels[:num_aux]
 
-    config = ExperimentConfig(
-        model=ModelConfig(
-            ctx_len=256,
-            vocab_size=4096,
-            num_layers=8,
-            num_heads=8,
-            num_key_value=2,
-            attn_bias=True,
-            mlp_dim=512 * 4,
-            eos_token_id=1,
-        ),
+    return ExperimentConfig(
         data=DataConfig(
             dirs=[data_dir],
-            aux=DataLabelConfig(labels=aux_labels),
+            core=all_labels[num_aux:],
+            aux=all_labels[:num_aux],
         ),
-        run=RunConfig(
-            warmup_prc=0.1,
-            decay_prc=0.1,
-            micro_batch_size=128, 
-            target_effective_batch_size=128,
-            accumulation_steps=1),
     )
 
-    return config
 
+def stories_model(embed_dim: int, num_layers: int, num_heads: int = 8) -> ModelConfig:
+    """Dense SimpleStories model (vocab 4096, ctx 512, EOS id 1) with a 4x MLP."""
 
-def GetRealisticConfig(model_size: int = 100e6, align: int = 64) -> ExperimentConfig:
-    """Production-scale experiment with FineWeb, code, and academic papers."""
-
-    model_params = find_base_params(model_size, V=50304, align=align)
-    # old_root_dir = Path("/workspace/gradient-routing/experiments/ICML-Codebase/src")
-
-    config = ExperimentConfig(
-        model=ModelConfig(**model_params, ctx_len=1024, eos_token_id=50256),
-        data=DataConfig(
-            dirs=[
-                root_dir / "data/fineweb",
-                root_dir / "data/code",
-                root_dir / "data/papers",
-            ],
-            core=DataLabelConfig(
-                labels=["fineweb", "code-other", "papers-other"],
-                method="optimal",
-                limit=1.0,
-                dist={
-                    "fineweb": 0.84,
-                    "code-other": 0.15,
-                    "papers-other": 0.01,
-                },
-            ),
-            aux=DataLabelConfig(
-                labels=["code-lisp", "papers-biology", "papers-nuclear", "papers-cyber"],
-                method="optimal",
-                limit=0.01,
-                dist={
-                    "code-lisp": 0.25,
-                    "papers-biology": 0.25,
-                    "papers-nuclear": 0.25,
-                    "papers-cyber": 0.25,
-                },
-            ),
-        ),
-        #ICML
-        # data=DataConfig(
-        #     dirs=[
-        #         old_root_dir / "data/fineweb",
-        #         old_root_dir / "data/bigcode",
-        #         old_root_dir / "data/arxiv",
-        #     ],
-        #     core=DataLabelConfig(
-        #         labels=["fineweb"],
-        #         method="optimal",
-        #         limit=1.0,
-        #         dist={
-        #             "fineweb": 1.0,
-        #         },
-        #     ),
-        #     aux=DataLabelConfig(
-        #         labels=["bigcode", "biology", "nuclear", "cyber"],
-        #         method="optimal",
-        #         limit=0.05,
-        #         dist={
-        #             "bigcode": 0.25,
-        #             "biology": 0.25,
-        #             "nuclear": 0.25,
-        #             "cyber": 0.25,
-        #         },
-        #     ),
-        # ),
-        run=RunConfig(),
+    return ModelConfig(
+        embed_dim=embed_dim,
+        num_layers=num_layers,
+        mlp_dim=4 * embed_dim,
+        num_heads=num_heads,
+        num_key_value=2,
+        ctx_len=512,
+        vocab_size=4096,
+        attn_bias=True,
+        eos_token_id=1,
     )
 
-    return config
+
+def chinchilla_tokens(model: ModelConfig, tokens_per_param: int = 20) -> int:
+    """Compute-optimal token budget (Hoffmann et al., 2022): ~20 tokens per parameter,
+    counting all parameters including embeddings."""
+
+    assert model.mlp_dim == 4 * model.embed_dim, "calc_base_params assumes a 4x MLP"
+    num_params = calc_base_params(model.embed_dim, model.num_layers, model.vocab_size, model.num_heads, model.num_key_value)
+    return tokens_per_param * num_params

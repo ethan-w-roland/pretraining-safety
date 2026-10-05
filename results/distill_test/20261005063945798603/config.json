@@ -1,0 +1,968 @@
+{
+    "stages": [
+        {
+            "model": {
+                "arch": "base",
+                "tokenizer": "TokenizersBackend(name_or_path='SimpleStories/SimpleStories-1.25M', vocab_size=4096, model_max_length=1000000000000000019884624838656, padding_side='right', truncation_side='right', special_tokens={'eos_token': '[EOS]', 'unk_token': '[UNK]'}, added_tokens_decoder={\n\t0: AddedToken(\"[UNK]\", rstrip=False, lstrip=False, single_word=False, normalized=False, special=True),\n\t1: AddedToken(\"[EOS]\", rstrip=False, lstrip=False, single_word=False, normalized=False, special=True),\n})",
+                "ctx_len": 512,
+                "vocab_size": 4096,
+                "num_layers": 9,
+                "num_heads": 8,
+                "num_key_value": 2,
+                "attn_bias": true,
+                "eos_token_id": 1,
+                "embed_dim": 448,
+                "mlp_dim": 1792
+            },
+            "train": {
+                "lr": 0.0001,
+                "bs": 64,
+                "ctx_len": 512,
+                "acc_steps": 1,
+                "warmup_prc": 0.1,
+                "decay_prc": 0.1,
+                "epochs": 1,
+                "adam_betas": [
+                    0.9,
+                    0.95
+                ],
+                "seed": 1,
+                "num_tokens": 22679392
+            },
+            "eval": {
+                "run": true,
+                "sample": false,
+                "elicit": false,
+                "num_train_evals": 10
+            },
+            "name": "base_20m",
+            "res_dir": "/workspace/modular-pretraining/results/distill_test/20261005063945798603/base_20m"
+        },
+        {
+            "model": {
+                "arch": "base",
+                "tokenizer": "TokenizersBackend(name_or_path='SimpleStories/SimpleStories-1.25M', vocab_size=4096, model_max_length=1000000000000000019884624838656, padding_side='right', truncation_side='right', special_tokens={'eos_token': '[EOS]', 'unk_token': '[UNK]'}, added_tokens_decoder={\n\t0: AddedToken(\"[UNK]\", rstrip=False, lstrip=False, single_word=False, normalized=False, special=True),\n\t1: AddedToken(\"[EOS]\", rstrip=False, lstrip=False, single_word=False, normalized=False, special=True),\n})",
+                "ctx_len": 512,
+                "vocab_size": 4096,
+                "num_layers": 9,
+                "num_heads": 8,
+                "num_key_value": 2,
+                "attn_bias": true,
+                "eos_token_id": 1,
+                "embed_dim": 448,
+                "mlp_dim": 1792
+            },
+            "train": {
+                "lr": 0.0001,
+                "bs": 64,
+                "ctx_len": 512,
+                "acc_steps": 1,
+                "warmup_prc": 0.1,
+                "decay_prc": 0.1,
+                "epochs": 1,
+                "adam_betas": [
+                    0.9,
+                    0.95
+                ],
+                "seed": 1,
+                "num_tokens": 22679392
+            },
+            "eval": {
+                "run": true,
+                "sample": false,
+                "elicit": true,
+                "num_train_evals": 10
+            },
+            "name": "filter_20m",
+            "res_dir": "/workspace/modular-pretraining/results/distill_test/20261005063945798603/filter_20m",
+            "retain_targets": [
+                [
+                    "core"
+                ]
+            ]
+        },
+        {
+            "model": {
+                "arch": "base",
+                "tokenizer": "TokenizersBackend(name_or_path='SimpleStories/SimpleStories-1.25M', vocab_size=4096, model_max_length=1000000000000000019884624838656, padding_side='right', truncation_side='right', special_tokens={'eos_token': '[EOS]', 'unk_token': '[UNK]'}, added_tokens_decoder={\n\t0: AddedToken(\"[UNK]\", rstrip=False, lstrip=False, single_word=False, normalized=False, special=True),\n\t1: AddedToken(\"[EOS]\", rstrip=False, lstrip=False, single_word=False, normalized=False, special=True),\n})",
+                "ctx_len": 512,
+                "vocab_size": 4096,
+                "num_layers": 5,
+                "num_heads": 8,
+                "num_key_value": 2,
+                "attn_bias": true,
+                "eos_token_id": 1,
+                "embed_dim": 256,
+                "mlp_dim": 1024
+            },
+            "train": {
+                "lr": 0.0001,
+                "bs": 64,
+                "ctx_len": 512,
+                "acc_steps": 1,
+                "warmup_prc": 0.1,
+                "decay_prc": 0.1,
+                "epochs": 1,
+                "adam_betas": [
+                    0.9,
+                    0.95
+                ],
+                "seed": 1,
+                "num_tokens": 5554304
+            },
+            "eval": {
+                "run": true,
+                "sample": false,
+                "elicit": false,
+                "num_train_evals": 10
+            },
+            "name": "base_5m",
+            "res_dir": "/workspace/modular-pretraining/results/distill_test/20261005063945798603/base_5m"
+        },
+        {
+            "model": {
+                "arch": "base",
+                "tokenizer": "TokenizersBackend(name_or_path='SimpleStories/SimpleStories-1.25M', vocab_size=4096, model_max_length=1000000000000000019884624838656, padding_side='right', truncation_side='right', special_tokens={'eos_token': '[EOS]', 'unk_token': '[UNK]'}, added_tokens_decoder={\n\t0: AddedToken(\"[UNK]\", rstrip=False, lstrip=False, single_word=False, normalized=False, special=True),\n\t1: AddedToken(\"[EOS]\", rstrip=False, lstrip=False, single_word=False, normalized=False, special=True),\n})",
+                "ctx_len": 512,
+                "vocab_size": 4096,
+                "num_layers": 5,
+                "num_heads": 8,
+                "num_key_value": 2,
+                "attn_bias": true,
+                "eos_token_id": 1,
+                "embed_dim": 256,
+                "mlp_dim": 1024
+            },
+            "train": {
+                "lr": 0.0001,
+                "bs": 64,
+                "ctx_len": 512,
+                "acc_steps": 1,
+                "warmup_prc": 0.1,
+                "decay_prc": 0.1,
+                "epochs": 1,
+                "adam_betas": [
+                    0.9,
+                    0.95
+                ],
+                "seed": 1,
+                "num_tokens": 5554304
+            },
+            "eval": {
+                "run": true,
+                "sample": false,
+                "elicit": true,
+                "num_train_evals": 10
+            },
+            "name": "filter_5m",
+            "res_dir": "/workspace/modular-pretraining/results/distill_test/20261005063945798603/filter_5m",
+            "retain_targets": [
+                [
+                    "core"
+                ]
+            ]
+        },
+        {
+            "model": {
+                "arch": "base",
+                "tokenizer": "TokenizersBackend(name_or_path='SimpleStories/SimpleStories-1.25M', vocab_size=4096, model_max_length=1000000000000000019884624838656, padding_side='right', truncation_side='right', special_tokens={'eos_token': '[EOS]', 'unk_token': '[UNK]'}, added_tokens_decoder={\n\t0: AddedToken(\"[UNK]\", rstrip=False, lstrip=False, single_word=False, normalized=False, special=True),\n\t1: AddedToken(\"[EOS]\", rstrip=False, lstrip=False, single_word=False, normalized=False, special=True),\n})",
+                "ctx_len": 512,
+                "vocab_size": 4096,
+                "num_layers": 5,
+                "num_heads": 8,
+                "num_key_value": 2,
+                "attn_bias": true,
+                "eos_token_id": 1,
+                "embed_dim": 256,
+                "mlp_dim": 1024
+            },
+            "train": {
+                "lr": 0.0001,
+                "bs": 64,
+                "ctx_len": 512,
+                "acc_steps": 1,
+                "warmup_prc": 0.1,
+                "decay_prc": 0.1,
+                "epochs": 1,
+                "adam_betas": [
+                    0.9,
+                    0.95
+                ],
+                "seed": 1,
+                "num_tokens": 5554304
+            },
+            "eval": {
+                "run": true,
+                "sample": false,
+                "elicit": true,
+                "num_train_evals": 10
+            },
+            "name": "distill_all_5m",
+            "res_dir": "/workspace/modular-pretraining/results/distill_test/20261005063945798603/distill_all_5m",
+            "retain_targets": [
+                [
+                    "core",
+                    "a-deadline-or-time-limit"
+                ]
+            ],
+            "teacher": "base_20m",
+            "teacher_type": "baseline",
+            "specialist": {
+                "lr": 0.0001,
+                "bs": 128,
+                "ctx_len": 512,
+                "acc_steps": 1,
+                "warmup_prc": 0.1,
+                "decay_prc": 0.1,
+                "epochs": 1,
+                "adam_betas": [
+                    0.9,
+                    0.95
+                ],
+                "seed": 42,
+                "num_tokens": -1
+            },
+            "alpha": 1.0,
+            "temperature": 1.0
+        },
+        {
+            "model": {
+                "arch": "base",
+                "tokenizer": "TokenizersBackend(name_or_path='SimpleStories/SimpleStories-1.25M', vocab_size=4096, model_max_length=1000000000000000019884624838656, padding_side='right', truncation_side='right', special_tokens={'eos_token': '[EOS]', 'unk_token': '[UNK]'}, added_tokens_decoder={\n\t0: AddedToken(\"[UNK]\", rstrip=False, lstrip=False, single_word=False, normalized=False, special=True),\n\t1: AddedToken(\"[EOS]\", rstrip=False, lstrip=False, single_word=False, normalized=False, special=True),\n})",
+                "ctx_len": 512,
+                "vocab_size": 4096,
+                "num_layers": 5,
+                "num_heads": 8,
+                "num_key_value": 2,
+                "attn_bias": true,
+                "eos_token_id": 1,
+                "embed_dim": 256,
+                "mlp_dim": 1024
+            },
+            "train": {
+                "lr": 0.0001,
+                "bs": 64,
+                "ctx_len": 512,
+                "acc_steps": 1,
+                "warmup_prc": 0.1,
+                "decay_prc": 0.1,
+                "epochs": 1,
+                "adam_betas": [
+                    0.9,
+                    0.95
+                ],
+                "seed": 1,
+                "num_tokens": 5554304
+            },
+            "eval": {
+                "run": true,
+                "sample": false,
+                "elicit": true,
+                "num_train_evals": 10
+            },
+            "name": "distill_base_5m",
+            "res_dir": "/workspace/modular-pretraining/results/distill_test/20261005063945798603/distill_base_5m",
+            "retain_targets": [
+                [
+                    "core"
+                ]
+            ],
+            "teacher": "base_20m",
+            "teacher_type": "baseline",
+            "specialist": {
+                "lr": 0.0001,
+                "bs": 128,
+                "ctx_len": 512,
+                "acc_steps": 1,
+                "warmup_prc": 0.1,
+                "decay_prc": 0.1,
+                "epochs": 1,
+                "adam_betas": [
+                    0.9,
+                    0.95
+                ],
+                "seed": 42,
+                "num_tokens": -1
+            },
+            "alpha": 1.0,
+            "temperature": 1.0
+        },
+        {
+            "model": {
+                "arch": "base",
+                "tokenizer": "TokenizersBackend(name_or_path='SimpleStories/SimpleStories-1.25M', vocab_size=4096, model_max_length=1000000000000000019884624838656, padding_side='right', truncation_side='right', special_tokens={'eos_token': '[EOS]', 'unk_token': '[UNK]'}, added_tokens_decoder={\n\t0: AddedToken(\"[UNK]\", rstrip=False, lstrip=False, single_word=False, normalized=False, special=True),\n\t1: AddedToken(\"[EOS]\", rstrip=False, lstrip=False, single_word=False, normalized=False, special=True),\n})",
+                "ctx_len": 512,
+                "vocab_size": 4096,
+                "num_layers": 5,
+                "num_heads": 8,
+                "num_key_value": 2,
+                "attn_bias": true,
+                "eos_token_id": 1,
+                "embed_dim": 256,
+                "mlp_dim": 1024
+            },
+            "train": {
+                "lr": 0.0001,
+                "bs": 64,
+                "ctx_len": 512,
+                "acc_steps": 1,
+                "warmup_prc": 0.1,
+                "decay_prc": 0.1,
+                "epochs": 1,
+                "adam_betas": [
+                    0.9,
+                    0.95
+                ],
+                "seed": 1,
+                "num_tokens": 5554304
+            },
+            "eval": {
+                "run": true,
+                "sample": false,
+                "elicit": true,
+                "num_train_evals": 10
+            },
+            "name": "distill_filter_5m",
+            "res_dir": "/workspace/modular-pretraining/results/distill_test/20261005063945798603/distill_filter_5m",
+            "retain_targets": [
+                [
+                    "core"
+                ]
+            ],
+            "teacher": "filter_20m",
+            "teacher_type": "filtering",
+            "specialist": {
+                "lr": 0.0001,
+                "bs": 128,
+                "ctx_len": 512,
+                "acc_steps": 1,
+                "warmup_prc": 0.1,
+                "decay_prc": 0.1,
+                "epochs": 1,
+                "adam_betas": [
+                    0.9,
+                    0.95
+                ],
+                "seed": 42,
+                "num_tokens": -1
+            },
+            "alpha": 1.0,
+            "temperature": 1.0
+        },
+        {
+            "model": {
+                "arch": "base",
+                "tokenizer": "TokenizersBackend(name_or_path='SimpleStories/SimpleStories-1.25M', vocab_size=4096, model_max_length=1000000000000000019884624838656, padding_side='right', truncation_side='right', special_tokens={'eos_token': '[EOS]', 'unk_token': '[UNK]'}, added_tokens_decoder={\n\t0: AddedToken(\"[UNK]\", rstrip=False, lstrip=False, single_word=False, normalized=False, special=True),\n\t1: AddedToken(\"[EOS]\", rstrip=False, lstrip=False, single_word=False, normalized=False, special=True),\n})",
+                "ctx_len": 512,
+                "vocab_size": 4096,
+                "num_layers": 5,
+                "num_heads": 8,
+                "num_key_value": 2,
+                "attn_bias": true,
+                "eos_token_id": 1,
+                "embed_dim": 256,
+                "mlp_dim": 1024
+            },
+            "train": {
+                "lr": 0.0001,
+                "bs": 64,
+                "ctx_len": 512,
+                "acc_steps": 1,
+                "warmup_prc": 0.1,
+                "decay_prc": 0.1,
+                "epochs": 1,
+                "adam_betas": [
+                    0.9,
+                    0.95
+                ],
+                "seed": 1,
+                "num_tokens": 5554304
+            },
+            "eval": {
+                "run": true,
+                "sample": false,
+                "elicit": true,
+                "num_train_evals": 10
+            },
+            "name": "distill_diff_5m",
+            "res_dir": "/workspace/modular-pretraining/results/distill_test/20261005063945798603/distill_diff_5m",
+            "retain_targets": [
+                [
+                    "core"
+                ]
+            ],
+            "teacher": "base_20m",
+            "teacher_type": "difference",
+            "specialist": {
+                "lr": 2.5e-05,
+                "bs": 64,
+                "ctx_len": 512,
+                "acc_steps": 1,
+                "warmup_prc": 0.1,
+                "decay_prc": 0.1,
+                "epochs": 1,
+                "adam_betas": [
+                    0.9,
+                    0.95
+                ],
+                "seed": 1,
+                "num_tokens": 481238
+            },
+            "alpha": 1.0,
+            "temperature": 1.0
+        }
+    ],
+    "data": {
+        "dirs": [
+            "/workspace/modular-pretraining/src/data/stories"
+        ],
+        "core": [
+            "alien-encounters",
+            "bygone-eras",
+            "cultural-traditions",
+            "dinosaurs",
+            "dream-worlds",
+            "enchanted-forests",
+            "fairy-tales",
+            "fantasy-worlds",
+            "gardens",
+            "giant-creatures",
+            "haunted-places",
+            "hidden-treasures",
+            "holidays",
+            "invisibility",
+            "island-adventures",
+            "living-objects",
+            "lost-cities",
+            "lost-civilizations",
+            "magical-lands",
+            "magical-objects",
+            "miniature-worlds",
+            "mysterious-maps",
+            "mystical-creatures",
+            "outer-space",
+            "pirates",
+            "riddles",
+            "robots-and-technology",
+            "royal-kingdoms",
+            "school-life",
+            "seasonal-changes",
+            "secret-societies",
+            "shape-shifting",
+            "sibling-rivalry",
+            "snowy-adventures",
+            "space-exploration",
+            "sports",
+            "subterranean-worlds",
+            "superheroes",
+            "talking-animals",
+            "the-arts",
+            "the-sky",
+            "time-travel",
+            "treasure-hunts",
+            "undercover-missions",
+            "underwater-adventures",
+            "unusual-vehicles",
+            "virtual-worlds"
+        ],
+        "aux": [
+            "a-deadline-or-time-limit"
+        ],
+        "datasets": {
+            "a-deadline-or-time-limit": {
+                "train": [
+                    "/workspace/modular-pretraining/src/data/stories/a-deadline-or-time-limit_train.bin"
+                ],
+                "test": [
+                    "/workspace/modular-pretraining/src/data/stories/a-deadline-or-time-limit_test.bin"
+                ]
+            },
+            "alien-encounters": {
+                "train": [
+                    "/workspace/modular-pretraining/src/data/stories/alien-encounters_train.bin"
+                ],
+                "test": [
+                    "/workspace/modular-pretraining/src/data/stories/alien-encounters_test.bin"
+                ]
+            },
+            "bygone-eras": {
+                "train": [
+                    "/workspace/modular-pretraining/src/data/stories/bygone-eras_train.bin"
+                ],
+                "test": [
+                    "/workspace/modular-pretraining/src/data/stories/bygone-eras_test.bin"
+                ]
+            },
+            "cultural-traditions": {
+                "train": [
+                    "/workspace/modular-pretraining/src/data/stories/cultural-traditions_train.bin"
+                ],
+                "test": [
+                    "/workspace/modular-pretraining/src/data/stories/cultural-traditions_test.bin"
+                ]
+            },
+            "dinosaurs": {
+                "train": [
+                    "/workspace/modular-pretraining/src/data/stories/dinosaurs_train.bin"
+                ],
+                "test": [
+                    "/workspace/modular-pretraining/src/data/stories/dinosaurs_test.bin"
+                ]
+            },
+            "dream-worlds": {
+                "train": [
+                    "/workspace/modular-pretraining/src/data/stories/dream-worlds_train.bin"
+                ],
+                "test": [
+                    "/workspace/modular-pretraining/src/data/stories/dream-worlds_test.bin"
+                ]
+            },
+            "enchanted-forests": {
+                "train": [
+                    "/workspace/modular-pretraining/src/data/stories/enchanted-forests_train.bin"
+                ],
+                "test": [
+                    "/workspace/modular-pretraining/src/data/stories/enchanted-forests_test.bin"
+                ]
+            },
+            "fairy-tales": {
+                "train": [
+                    "/workspace/modular-pretraining/src/data/stories/fairy-tales_train.bin"
+                ],
+                "test": [
+                    "/workspace/modular-pretraining/src/data/stories/fairy-tales_test.bin"
+                ]
+            },
+            "fantasy-worlds": {
+                "train": [
+                    "/workspace/modular-pretraining/src/data/stories/fantasy-worlds_train.bin"
+                ],
+                "test": [
+                    "/workspace/modular-pretraining/src/data/stories/fantasy-worlds_test.bin"
+                ]
+            },
+            "gardens": {
+                "train": [
+                    "/workspace/modular-pretraining/src/data/stories/gardens_train.bin"
+                ],
+                "test": [
+                    "/workspace/modular-pretraining/src/data/stories/gardens_test.bin"
+                ]
+            },
+            "giant-creatures": {
+                "train": [
+                    "/workspace/modular-pretraining/src/data/stories/giant-creatures_train.bin"
+                ],
+                "test": [
+                    "/workspace/modular-pretraining/src/data/stories/giant-creatures_test.bin"
+                ]
+            },
+            "haunted-places": {
+                "train": [
+                    "/workspace/modular-pretraining/src/data/stories/haunted-places_train.bin"
+                ],
+                "test": [
+                    "/workspace/modular-pretraining/src/data/stories/haunted-places_test.bin"
+                ]
+            },
+            "hidden-treasures": {
+                "train": [
+                    "/workspace/modular-pretraining/src/data/stories/hidden-treasures_train.bin"
+                ],
+                "test": [
+                    "/workspace/modular-pretraining/src/data/stories/hidden-treasures_test.bin"
+                ]
+            },
+            "holidays": {
+                "train": [
+                    "/workspace/modular-pretraining/src/data/stories/holidays_train.bin"
+                ],
+                "test": [
+                    "/workspace/modular-pretraining/src/data/stories/holidays_test.bin"
+                ]
+            },
+            "invisibility": {
+                "train": [
+                    "/workspace/modular-pretraining/src/data/stories/invisibility_train.bin"
+                ],
+                "test": [
+                    "/workspace/modular-pretraining/src/data/stories/invisibility_test.bin"
+                ]
+            },
+            "island-adventures": {
+                "train": [
+                    "/workspace/modular-pretraining/src/data/stories/island-adventures_train.bin"
+                ],
+                "test": [
+                    "/workspace/modular-pretraining/src/data/stories/island-adventures_test.bin"
+                ]
+            },
+            "living-objects": {
+                "train": [
+                    "/workspace/modular-pretraining/src/data/stories/living-objects_train.bin"
+                ],
+                "test": [
+                    "/workspace/modular-pretraining/src/data/stories/living-objects_test.bin"
+                ]
+            },
+            "lost-cities": {
+                "train": [
+                    "/workspace/modular-pretraining/src/data/stories/lost-cities_train.bin"
+                ],
+                "test": [
+                    "/workspace/modular-pretraining/src/data/stories/lost-cities_test.bin"
+                ]
+            },
+            "lost-civilizations": {
+                "train": [
+                    "/workspace/modular-pretraining/src/data/stories/lost-civilizations_train.bin"
+                ],
+                "test": [
+                    "/workspace/modular-pretraining/src/data/stories/lost-civilizations_test.bin"
+                ]
+            },
+            "magical-lands": {
+                "train": [
+                    "/workspace/modular-pretraining/src/data/stories/magical-lands_train.bin"
+                ],
+                "test": [
+                    "/workspace/modular-pretraining/src/data/stories/magical-lands_test.bin"
+                ]
+            },
+            "magical-objects": {
+                "train": [
+                    "/workspace/modular-pretraining/src/data/stories/magical-objects_train.bin"
+                ],
+                "test": [
+                    "/workspace/modular-pretraining/src/data/stories/magical-objects_test.bin"
+                ]
+            },
+            "miniature-worlds": {
+                "train": [
+                    "/workspace/modular-pretraining/src/data/stories/miniature-worlds_train.bin"
+                ],
+                "test": [
+                    "/workspace/modular-pretraining/src/data/stories/miniature-worlds_test.bin"
+                ]
+            },
+            "mysterious-maps": {
+                "train": [
+                    "/workspace/modular-pretraining/src/data/stories/mysterious-maps_train.bin"
+                ],
+                "test": [
+                    "/workspace/modular-pretraining/src/data/stories/mysterious-maps_test.bin"
+                ]
+            },
+            "mystical-creatures": {
+                "train": [
+                    "/workspace/modular-pretraining/src/data/stories/mystical-creatures_train.bin"
+                ],
+                "test": [
+                    "/workspace/modular-pretraining/src/data/stories/mystical-creatures_test.bin"
+                ]
+            },
+            "outer-space": {
+                "train": [
+                    "/workspace/modular-pretraining/src/data/stories/outer-space_train.bin"
+                ],
+                "test": [
+                    "/workspace/modular-pretraining/src/data/stories/outer-space_test.bin"
+                ]
+            },
+            "pirates": {
+                "train": [
+                    "/workspace/modular-pretraining/src/data/stories/pirates_train.bin"
+                ],
+                "test": [
+                    "/workspace/modular-pretraining/src/data/stories/pirates_test.bin"
+                ]
+            },
+            "riddles": {
+                "train": [
+                    "/workspace/modular-pretraining/src/data/stories/riddles_train.bin"
+                ],
+                "test": [
+                    "/workspace/modular-pretraining/src/data/stories/riddles_test.bin"
+                ]
+            },
+            "robots-and-technology": {
+                "train": [
+                    "/workspace/modular-pretraining/src/data/stories/robots-and-technology_train.bin"
+                ],
+                "test": [
+                    "/workspace/modular-pretraining/src/data/stories/robots-and-technology_test.bin"
+                ]
+            },
+            "royal-kingdoms": {
+                "train": [
+                    "/workspace/modular-pretraining/src/data/stories/royal-kingdoms_train.bin"
+                ],
+                "test": [
+                    "/workspace/modular-pretraining/src/data/stories/royal-kingdoms_test.bin"
+                ]
+            },
+            "school-life": {
+                "train": [
+                    "/workspace/modular-pretraining/src/data/stories/school-life_train.bin"
+                ],
+                "test": [
+                    "/workspace/modular-pretraining/src/data/stories/school-life_test.bin"
+                ]
+            },
+            "seasonal-changes": {
+                "train": [
+                    "/workspace/modular-pretraining/src/data/stories/seasonal-changes_train.bin"
+                ],
+                "test": [
+                    "/workspace/modular-pretraining/src/data/stories/seasonal-changes_test.bin"
+                ]
+            },
+            "secret-societies": {
+                "train": [
+                    "/workspace/modular-pretraining/src/data/stories/secret-societies_train.bin"
+                ],
+                "test": [
+                    "/workspace/modular-pretraining/src/data/stories/secret-societies_test.bin"
+                ]
+            },
+            "shape-shifting": {
+                "train": [
+                    "/workspace/modular-pretraining/src/data/stories/shape-shifting_train.bin"
+                ],
+                "test": [
+                    "/workspace/modular-pretraining/src/data/stories/shape-shifting_test.bin"
+                ]
+            },
+            "sibling-rivalry": {
+                "train": [
+                    "/workspace/modular-pretraining/src/data/stories/sibling-rivalry_train.bin"
+                ],
+                "test": [
+                    "/workspace/modular-pretraining/src/data/stories/sibling-rivalry_test.bin"
+                ]
+            },
+            "snowy-adventures": {
+                "train": [
+                    "/workspace/modular-pretraining/src/data/stories/snowy-adventures_train.bin"
+                ],
+                "test": [
+                    "/workspace/modular-pretraining/src/data/stories/snowy-adventures_test.bin"
+                ]
+            },
+            "space-exploration": {
+                "train": [
+                    "/workspace/modular-pretraining/src/data/stories/space-exploration_train.bin"
+                ],
+                "test": [
+                    "/workspace/modular-pretraining/src/data/stories/space-exploration_test.bin"
+                ]
+            },
+            "sports": {
+                "train": [
+                    "/workspace/modular-pretraining/src/data/stories/sports_train.bin"
+                ],
+                "test": [
+                    "/workspace/modular-pretraining/src/data/stories/sports_test.bin"
+                ]
+            },
+            "subterranean-worlds": {
+                "train": [
+                    "/workspace/modular-pretraining/src/data/stories/subterranean-worlds_train.bin"
+                ],
+                "test": [
+                    "/workspace/modular-pretraining/src/data/stories/subterranean-worlds_test.bin"
+                ]
+            },
+            "superheroes": {
+                "train": [
+                    "/workspace/modular-pretraining/src/data/stories/superheroes_train.bin"
+                ],
+                "test": [
+                    "/workspace/modular-pretraining/src/data/stories/superheroes_test.bin"
+                ]
+            },
+            "talking-animals": {
+                "train": [
+                    "/workspace/modular-pretraining/src/data/stories/talking-animals_train.bin"
+                ],
+                "test": [
+                    "/workspace/modular-pretraining/src/data/stories/talking-animals_test.bin"
+                ]
+            },
+            "the-arts": {
+                "train": [
+                    "/workspace/modular-pretraining/src/data/stories/the-arts_train.bin"
+                ],
+                "test": [
+                    "/workspace/modular-pretraining/src/data/stories/the-arts_test.bin"
+                ]
+            },
+            "the-sky": {
+                "train": [
+                    "/workspace/modular-pretraining/src/data/stories/the-sky_train.bin"
+                ],
+                "test": [
+                    "/workspace/modular-pretraining/src/data/stories/the-sky_test.bin"
+                ]
+            },
+            "time-travel": {
+                "train": [
+                    "/workspace/modular-pretraining/src/data/stories/time-travel_train.bin"
+                ],
+                "test": [
+                    "/workspace/modular-pretraining/src/data/stories/time-travel_test.bin"
+                ]
+            },
+            "treasure-hunts": {
+                "train": [
+                    "/workspace/modular-pretraining/src/data/stories/treasure-hunts_train.bin"
+                ],
+                "test": [
+                    "/workspace/modular-pretraining/src/data/stories/treasure-hunts_test.bin"
+                ]
+            },
+            "undercover-missions": {
+                "train": [
+                    "/workspace/modular-pretraining/src/data/stories/undercover-missions_train.bin"
+                ],
+                "test": [
+                    "/workspace/modular-pretraining/src/data/stories/undercover-missions_test.bin"
+                ]
+            },
+            "underwater-adventures": {
+                "train": [
+                    "/workspace/modular-pretraining/src/data/stories/underwater-adventures_train.bin"
+                ],
+                "test": [
+                    "/workspace/modular-pretraining/src/data/stories/underwater-adventures_test.bin"
+                ]
+            },
+            "unusual-vehicles": {
+                "train": [
+                    "/workspace/modular-pretraining/src/data/stories/unusual-vehicles_train.bin"
+                ],
+                "test": [
+                    "/workspace/modular-pretraining/src/data/stories/unusual-vehicles_test.bin"
+                ]
+            },
+            "virtual-worlds": {
+                "train": [
+                    "/workspace/modular-pretraining/src/data/stories/virtual-worlds_train.bin"
+                ],
+                "test": [
+                    "/workspace/modular-pretraining/src/data/stories/virtual-worlds_test.bin"
+                ]
+            },
+            "core": {
+                "train": [
+                    "/workspace/modular-pretraining/src/data/stories/alien-encounters_train.bin",
+                    "/workspace/modular-pretraining/src/data/stories/bygone-eras_train.bin",
+                    "/workspace/modular-pretraining/src/data/stories/cultural-traditions_train.bin",
+                    "/workspace/modular-pretraining/src/data/stories/dinosaurs_train.bin",
+                    "/workspace/modular-pretraining/src/data/stories/dream-worlds_train.bin",
+                    "/workspace/modular-pretraining/src/data/stories/enchanted-forests_train.bin",
+                    "/workspace/modular-pretraining/src/data/stories/fairy-tales_train.bin",
+                    "/workspace/modular-pretraining/src/data/stories/fantasy-worlds_train.bin",
+                    "/workspace/modular-pretraining/src/data/stories/gardens_train.bin",
+                    "/workspace/modular-pretraining/src/data/stories/giant-creatures_train.bin",
+                    "/workspace/modular-pretraining/src/data/stories/haunted-places_train.bin",
+                    "/workspace/modular-pretraining/src/data/stories/hidden-treasures_train.bin",
+                    "/workspace/modular-pretraining/src/data/stories/holidays_train.bin",
+                    "/workspace/modular-pretraining/src/data/stories/invisibility_train.bin",
+                    "/workspace/modular-pretraining/src/data/stories/island-adventures_train.bin",
+                    "/workspace/modular-pretraining/src/data/stories/living-objects_train.bin",
+                    "/workspace/modular-pretraining/src/data/stories/lost-cities_train.bin",
+                    "/workspace/modular-pretraining/src/data/stories/lost-civilizations_train.bin",
+                    "/workspace/modular-pretraining/src/data/stories/magical-lands_train.bin",
+                    "/workspace/modular-pretraining/src/data/stories/magical-objects_train.bin",
+                    "/workspace/modular-pretraining/src/data/stories/miniature-worlds_train.bin",
+                    "/workspace/modular-pretraining/src/data/stories/mysterious-maps_train.bin",
+                    "/workspace/modular-pretraining/src/data/stories/mystical-creatures_train.bin",
+                    "/workspace/modular-pretraining/src/data/stories/outer-space_train.bin",
+                    "/workspace/modular-pretraining/src/data/stories/pirates_train.bin",
+                    "/workspace/modular-pretraining/src/data/stories/riddles_train.bin",
+                    "/workspace/modular-pretraining/src/data/stories/robots-and-technology_train.bin",
+                    "/workspace/modular-pretraining/src/data/stories/royal-kingdoms_train.bin",
+                    "/workspace/modular-pretraining/src/data/stories/school-life_train.bin",
+                    "/workspace/modular-pretraining/src/data/stories/seasonal-changes_train.bin",
+                    "/workspace/modular-pretraining/src/data/stories/secret-societies_train.bin",
+                    "/workspace/modular-pretraining/src/data/stories/shape-shifting_train.bin",
+                    "/workspace/modular-pretraining/src/data/stories/sibling-rivalry_train.bin",
+                    "/workspace/modular-pretraining/src/data/stories/snowy-adventures_train.bin",
+                    "/workspace/modular-pretraining/src/data/stories/space-exploration_train.bin",
+                    "/workspace/modular-pretraining/src/data/stories/sports_train.bin",
+                    "/workspace/modular-pretraining/src/data/stories/subterranean-worlds_train.bin",
+                    "/workspace/modular-pretraining/src/data/stories/superheroes_train.bin",
+                    "/workspace/modular-pretraining/src/data/stories/talking-animals_train.bin",
+                    "/workspace/modular-pretraining/src/data/stories/the-arts_train.bin",
+                    "/workspace/modular-pretraining/src/data/stories/the-sky_train.bin",
+                    "/workspace/modular-pretraining/src/data/stories/time-travel_train.bin",
+                    "/workspace/modular-pretraining/src/data/stories/treasure-hunts_train.bin",
+                    "/workspace/modular-pretraining/src/data/stories/undercover-missions_train.bin",
+                    "/workspace/modular-pretraining/src/data/stories/underwater-adventures_train.bin",
+                    "/workspace/modular-pretraining/src/data/stories/unusual-vehicles_train.bin",
+                    "/workspace/modular-pretraining/src/data/stories/virtual-worlds_train.bin"
+                ],
+                "test": [
+                    "/workspace/modular-pretraining/src/data/stories/alien-encounters_test.bin",
+                    "/workspace/modular-pretraining/src/data/stories/bygone-eras_test.bin",
+                    "/workspace/modular-pretraining/src/data/stories/cultural-traditions_test.bin",
+                    "/workspace/modular-pretraining/src/data/stories/dinosaurs_test.bin",
+                    "/workspace/modular-pretraining/src/data/stories/dream-worlds_test.bin",
+                    "/workspace/modular-pretraining/src/data/stories/enchanted-forests_test.bin",
+                    "/workspace/modular-pretraining/src/data/stories/fairy-tales_test.bin",
+                    "/workspace/modular-pretraining/src/data/stories/fantasy-worlds_test.bin",
+                    "/workspace/modular-pretraining/src/data/stories/gardens_test.bin",
+                    "/workspace/modular-pretraining/src/data/stories/giant-creatures_test.bin",
+                    "/workspace/modular-pretraining/src/data/stories/haunted-places_test.bin",
+                    "/workspace/modular-pretraining/src/data/stories/hidden-treasures_test.bin",
+                    "/workspace/modular-pretraining/src/data/stories/holidays_test.bin",
+                    "/workspace/modular-pretraining/src/data/stories/invisibility_test.bin",
+                    "/workspace/modular-pretraining/src/data/stories/island-adventures_test.bin",
+                    "/workspace/modular-pretraining/src/data/stories/living-objects_test.bin",
+                    "/workspace/modular-pretraining/src/data/stories/lost-cities_test.bin",
+                    "/workspace/modular-pretraining/src/data/stories/lost-civilizations_test.bin",
+                    "/workspace/modular-pretraining/src/data/stories/magical-lands_test.bin",
+                    "/workspace/modular-pretraining/src/data/stories/magical-objects_test.bin",
+                    "/workspace/modular-pretraining/src/data/stories/miniature-worlds_test.bin",
+                    "/workspace/modular-pretraining/src/data/stories/mysterious-maps_test.bin",
+                    "/workspace/modular-pretraining/src/data/stories/mystical-creatures_test.bin",
+                    "/workspace/modular-pretraining/src/data/stories/outer-space_test.bin",
+                    "/workspace/modular-pretraining/src/data/stories/pirates_test.bin",
+                    "/workspace/modular-pretraining/src/data/stories/riddles_test.bin",
+                    "/workspace/modular-pretraining/src/data/stories/robots-and-technology_test.bin",
+                    "/workspace/modular-pretraining/src/data/stories/royal-kingdoms_test.bin",
+                    "/workspace/modular-pretraining/src/data/stories/school-life_test.bin",
+                    "/workspace/modular-pretraining/src/data/stories/seasonal-changes_test.bin",
+                    "/workspace/modular-pretraining/src/data/stories/secret-societies_test.bin",
+                    "/workspace/modular-pretraining/src/data/stories/shape-shifting_test.bin",
+                    "/workspace/modular-pretraining/src/data/stories/sibling-rivalry_test.bin",
+                    "/workspace/modular-pretraining/src/data/stories/snowy-adventures_test.bin",
+                    "/workspace/modular-pretraining/src/data/stories/space-exploration_test.bin",
+                    "/workspace/modular-pretraining/src/data/stories/sports_test.bin",
+                    "/workspace/modular-pretraining/src/data/stories/subterranean-worlds_test.bin",
+                    "/workspace/modular-pretraining/src/data/stories/superheroes_test.bin",
+                    "/workspace/modular-pretraining/src/data/stories/talking-animals_test.bin",
+                    "/workspace/modular-pretraining/src/data/stories/the-arts_test.bin",
+                    "/workspace/modular-pretraining/src/data/stories/the-sky_test.bin",
+                    "/workspace/modular-pretraining/src/data/stories/time-travel_test.bin",
+                    "/workspace/modular-pretraining/src/data/stories/treasure-hunts_test.bin",
+                    "/workspace/modular-pretraining/src/data/stories/undercover-missions_test.bin",
+                    "/workspace/modular-pretraining/src/data/stories/underwater-adventures_test.bin",
+                    "/workspace/modular-pretraining/src/data/stories/unusual-vehicles_test.bin",
+                    "/workspace/modular-pretraining/src/data/stories/virtual-worlds_test.bin"
+                ]
+            }
+        }
+    },
+    "compile": true,
+    "find_unused_parameters": false,
+    "is_ddp": true,
+    "log_level": "DEBUG",
+    "num_gpus": 2,
+    "process_id": 0,
+    "device": "cuda",
+    "logger": "<Logger training_20261005063945798603 (DEBUG)>",
+    "res_root": "/workspace/modular-pretraining/results/distill_test",
+    "experiment_id": "20261005063945798603"
+}

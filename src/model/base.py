@@ -201,21 +201,23 @@ class BaseTransformer(Transformer):
             h = self.norm(h)
             return self.unembed(h)
         
-        logits = run_stack(tokens, stop_at_layer) # (B, T, V)
+        out = run_stack(tokens, stop_at_layer) # (B, T, V)
 
         if stop_at_layer is not None:
-            return logits, loss
+            #out is activtion at the stop layer
+            return out, loss
 
         if targets is not None:
             #calculate CE loss
             loss = F.cross_entropy(
-                logits.view(-1, logits.size(-1)),
+                out.view(-1, out.size(-1)),
                 targets.reshape(-1),
                 ignore_index=-1000,
                 reduction="mean",
             )
        
-        return logits, loss
+        #out is logits
+        return out, loss
 
 
 def make_attention_mask(tokens: torch.Tensor, eos_token_id: int) -> torch.Tensor:

@@ -1,0 +1,2198 @@
+[GPU 0] [06:49:41] [INFO] Git branch: main, commit: d07d62e9869c6a969a2306e755aba7a742c317fd
+[GPU 0] [06:49:41] [INFO] Number of GPUs: 2
+[GPU 0] [06:49:41] [INFO] Tokenizer vocabulary: 4096
+[GPU 0] [06:49:41] [INFO] Set model vocab size to nearest multiple of 64 of tokenizer size: 4096
+[GPU 0] [06:49:41] [DEBUG] Saved config to /workspace/modular-pretraining/results/distill/seed_1/20261005064940764364/config.json
+[GPU 0] [06:49:41] [DEBUG] {
+    "stages": [
+        {
+            "model": {
+                "arch": "base",
+                "tokenizer": "TokenizersBackend(name_or_path='SimpleStories/SimpleStories-1.25M', vocab_size=4096, model_max_length=1000000000000000019884624838656, padding_side='right', truncation_side='right', special_tokens={'eos_token': '[EOS]', 'unk_token': '[UNK]'}, added_tokens_decoder={\n\t0: AddedToken(\"[UNK]\", rstrip=False, lstrip=False, single_word=False, normalized=False, special=True),\n\t1: AddedToken(\"[EOS]\", rstrip=False, lstrip=False, single_word=False, normalized=False, special=True),\n})",
+                "ctx_len": 512,
+                "vocab_size": 4096,
+                "num_layers": 9,
+                "num_heads": 8,
+                "num_key_value": 2,
+                "attn_bias": true,
+                "eos_token_id": 1,
+                "embed_dim": 448,
+                "mlp_dim": 1792
+            },
+            "train": {
+                "lr": 0.0001,
+                "bs": 64,
+                "ctx_len": 512,
+                "acc_steps": 1,
+                "warmup_prc": 0.1,
+                "decay_prc": 0.1,
+                "epochs": 1,
+                "adam_betas": [
+                    0.9,
+                    0.95
+                ],
+                "seed": 1,
+                "num_tokens": 453587840
+            },
+            "eval": {
+                "run": true,
+                "sample": false,
+                "elicit": false,
+                "num_train_evals": 200
+            },
+            "name": "base_20m",
+            "res_dir": "/workspace/modular-pretraining/results/distill/seed_1/20261005064940764364/base_20m"
+        },
+        {
+            "model": {
+                "arch": "base",
+                "tokenizer": "TokenizersBackend(name_or_path='SimpleStories/SimpleStories-1.25M', vocab_size=4096, model_max_length=1000000000000000019884624838656, padding_side='right', truncation_side='right', special_tokens={'eos_token': '[EOS]', 'unk_token': '[UNK]'}, added_tokens_decoder={\n\t0: AddedToken(\"[UNK]\", rstrip=False, lstrip=False, single_word=False, normalized=False, special=True),\n\t1: AddedToken(\"[EOS]\", rstrip=False, lstrip=False, single_word=False, normalized=False, special=True),\n})",
+                "ctx_len": 512,
+                "vocab_size": 4096,
+                "num_layers": 9,
+                "num_heads": 8,
+                "num_key_value": 2,
+                "attn_bias": true,
+                "eos_token_id": 1,
+                "embed_dim": 448,
+                "mlp_dim": 1792
+            },
+            "train": {
+                "lr": 0.0001,
+                "bs": 64,
+                "ctx_len": 512,
+                "acc_steps": 1,
+                "warmup_prc": 0.1,
+                "decay_prc": 0.1,
+                "epochs": 1,
+                "adam_betas": [
+                    0.9,
+                    0.95
+                ],
+                "seed": 1,
+                "num_tokens": 453587840
+            },
+            "eval": {
+                "run": true,
+                "sample": false,
+                "elicit": true,
+                "num_train_evals": 200
+            },
+            "name": "filter_20m",
+            "res_dir": "/workspace/modular-pretraining/results/distill/seed_1/20261005064940764364/filter_20m",
+            "retain_targets": [
+                [
+                    "core"
+                ]
+            ]
+        },
+        {
+            "model": {
+                "arch": "base",
+                "tokenizer": "TokenizersBackend(name_or_path='SimpleStories/SimpleStories-1.25M', vocab_size=4096, model_max_length=1000000000000000019884624838656, padding_side='right', truncation_side='right', special_tokens={'eos_token': '[EOS]', 'unk_token': '[UNK]'}, added_tokens_decoder={\n\t0: AddedToken(\"[UNK]\", rstrip=False, lstrip=False, single_word=False, normalized=False, special=True),\n\t1: AddedToken(\"[EOS]\", rstrip=False, lstrip=False, single_word=False, normalized=False, special=True),\n})",
+                "ctx_len": 512,
+                "vocab_size": 4096,
+                "num_layers": 5,
+                "num_heads": 8,
+                "num_key_value": 2,
+                "attn_bias": true,
+                "eos_token_id": 1,
+                "embed_dim": 256,
+                "mlp_dim": 1024
+            },
+            "train": {
+                "lr": 0.0001,
+                "bs": 64,
+                "ctx_len": 512,
+                "acc_steps": 1,
+                "warmup_prc": 0.1,
+                "decay_prc": 0.1,
+                "epochs": 1,
+                "adam_betas": [
+                    0.9,
+                    0.95
+                ],
+                "seed": 1,
+                "num_tokens": 111086080
+            },
+            "eval": {
+                "run": true,
+                "sample": false,
+                "elicit": false,
+                "num_train_evals": 200
+            },
+            "name": "base_5m",
+            "res_dir": "/workspace/modular-pretraining/results/distill/seed_1/20261005064940764364/base_5m"
+        },
+        {
+            "model": {
+                "arch": "base",
+                "tokenizer": "TokenizersBackend(name_or_path='SimpleStories/SimpleStories-1.25M', vocab_size=4096, model_max_length=1000000000000000019884624838656, padding_side='right', truncation_side='right', special_tokens={'eos_token': '[EOS]', 'unk_token': '[UNK]'}, added_tokens_decoder={\n\t0: AddedToken(\"[UNK]\", rstrip=False, lstrip=False, single_word=False, normalized=False, special=True),\n\t1: AddedToken(\"[EOS]\", rstrip=False, lstrip=False, single_word=False, normalized=False, special=True),\n})",
+                "ctx_len": 512,
+                "vocab_size": 4096,
+                "num_layers": 5,
+                "num_heads": 8,
+                "num_key_value": 2,
+                "attn_bias": true,
+                "eos_token_id": 1,
+                "embed_dim": 256,
+                "mlp_dim": 1024
+            },
+            "train": {
+                "lr": 0.0001,
+                "bs": 64,
+                "ctx_len": 512,
+                "acc_steps": 1,
+                "warmup_prc": 0.1,
+                "decay_prc": 0.1,
+                "epochs": 1,
+                "adam_betas": [
+                    0.9,
+                    0.95
+                ],
+                "seed": 1,
+                "num_tokens": 111086080
+            },
+            "eval": {
+                "run": true,
+                "sample": false,
+                "elicit": true,
+                "num_train_evals": 200
+            },
+            "name": "filter_5m",
+            "res_dir": "/workspace/modular-pretraining/results/distill/seed_1/20261005064940764364/filter_5m",
+            "retain_targets": [
+                [
+                    "core"
+                ]
+            ]
+        },
+        {
+            "model": {
+                "arch": "base",
+                "tokenizer": "TokenizersBackend(name_or_path='SimpleStories/SimpleStories-1.25M', vocab_size=4096, model_max_length=1000000000000000019884624838656, padding_side='right', truncation_side='right', special_tokens={'eos_token': '[EOS]', 'unk_token': '[UNK]'}, added_tokens_decoder={\n\t0: AddedToken(\"[UNK]\", rstrip=False, lstrip=False, single_word=False, normalized=False, special=True),\n\t1: AddedToken(\"[EOS]\", rstrip=False, lstrip=False, single_word=False, normalized=False, special=True),\n})",
+                "ctx_len": 512,
+                "vocab_size": 4096,
+                "num_layers": 5,
+                "num_heads": 8,
+                "num_key_value": 2,
+                "attn_bias": true,
+                "eos_token_id": 1,
+                "embed_dim": 256,
+                "mlp_dim": 1024
+            },
+            "train": {
+                "lr": 0.0001,
+                "bs": 64,
+                "ctx_len": 512,
+                "acc_steps": 1,
+                "warmup_prc": 0.1,
+                "decay_prc": 0.1,
+                "epochs": 1,
+                "adam_betas": [
+                    0.9,
+                    0.95
+                ],
+                "seed": 1,
+                "num_tokens": 111086080
+            },
+            "eval": {
+                "run": true,
+                "sample": false,
+                "elicit": true,
+                "num_train_evals": 200
+            },
+            "name": "distill_all_5m",
+            "res_dir": "/workspace/modular-pretraining/results/distill/seed_1/20261005064940764364/distill_all_5m",
+            "retain_targets": [
+                [
+                    "core",
+                    "a-deadline-or-time-limit"
+                ]
+            ],
+            "teacher": "base_20m",
+            "teacher_type": "baseline",
+            "specialist": {
+                "lr": 0.0001,
+                "bs": 128,
+                "ctx_len": 512,
+                "acc_steps": 1,
+                "warmup_prc": 0.1,
+                "decay_prc": 0.1,
+                "epochs": 1,
+                "adam_betas": [
+                    0.9,
+                    0.95
+                ],
+                "seed": 42,
+                "num_tokens": -1
+            },
+            "alpha": 1.0,
+            "temperature": 1.0
+        },
+        {
+            "model": {
+                "arch": "base",
+                "tokenizer": "TokenizersBackend(name_or_path='SimpleStories/SimpleStories-1.25M', vocab_size=4096, model_max_length=1000000000000000019884624838656, padding_side='right', truncation_side='right', special_tokens={'eos_token': '[EOS]', 'unk_token': '[UNK]'}, added_tokens_decoder={\n\t0: AddedToken(\"[UNK]\", rstrip=False, lstrip=False, single_word=False, normalized=False, special=True),\n\t1: AddedToken(\"[EOS]\", rstrip=False, lstrip=False, single_word=False, normalized=False, special=True),\n})",
+                "ctx_len": 512,
+                "vocab_size": 4096,
+                "num_layers": 5,
+                "num_heads": 8,
+                "num_key_value": 2,
+                "attn_bias": true,
+                "eos_token_id": 1,
+                "embed_dim": 256,
+                "mlp_dim": 1024
+            },
+            "train": {
+                "lr": 0.0001,
+                "bs": 64,
+                "ctx_len": 512,
+                "acc_steps": 1,
+                "warmup_prc": 0.1,
+                "decay_prc": 0.1,
+                "epochs": 1,
+                "adam_betas": [
+                    0.9,
+                    0.95
+                ],
+                "seed": 1,
+                "num_tokens": 111086080
+            },
+            "eval": {
+                "run": true,
+                "sample": false,
+                "elicit": true,
+                "num_train_evals": 200
+            },
+            "name": "distill_base_5m",
+            "res_dir": "/workspace/modular-pretraining/results/distill/seed_1/20261005064940764364/distill_base_5m",
+            "retain_targets": [
+                [
+                    "core"
+                ]
+            ],
+            "teacher": "base_20m",
+            "teacher_type": "baseline",
+            "specialist": {
+                "lr": 0.0001,
+                "bs": 128,
+                "ctx_len": 512,
+                "acc_steps": 1,
+                "warmup_prc": 0.1,
+                "decay_prc": 0.1,
+                "epochs": 1,
+                "adam_betas": [
+                    0.9,
+                    0.95
+                ],
+                "seed": 42,
+                "num_tokens": -1
+            },
+            "alpha": 1.0,
+            "temperature": 1.0
+        },
+        {
+            "model": {
+                "arch": "base",
+                "tokenizer": "TokenizersBackend(name_or_path='SimpleStories/SimpleStories-1.25M', vocab_size=4096, model_max_length=1000000000000000019884624838656, padding_side='right', truncation_side='right', special_tokens={'eos_token': '[EOS]', 'unk_token': '[UNK]'}, added_tokens_decoder={\n\t0: AddedToken(\"[UNK]\", rstrip=False, lstrip=False, single_word=False, normalized=False, special=True),\n\t1: AddedToken(\"[EOS]\", rstrip=False, lstrip=False, single_word=False, normalized=False, special=True),\n})",
+                "ctx_len": 512,
+                "vocab_size": 4096,
+                "num_layers": 5,
+                "num_heads": 8,
+                "num_key_value": 2,
+                "attn_bias": true,
+                "eos_token_id": 1,
+                "embed_dim": 256,
+                "mlp_dim": 1024
+            },
+            "train": {
+                "lr": 0.0001,
+                "bs": 64,
+                "ctx_len": 512,
+                "acc_steps": 1,
+                "warmup_prc": 0.1,
+                "decay_prc": 0.1,
+                "epochs": 1,
+                "adam_betas": [
+                    0.9,
+                    0.95
+                ],
+                "seed": 1,
+                "num_tokens": 111086080
+            },
+            "eval": {
+                "run": true,
+                "sample": false,
+                "elicit": true,
+                "num_train_evals": 200
+            },
+            "name": "distill_filter_5m",
+            "res_dir": "/workspace/modular-pretraining/results/distill/seed_1/20261005064940764364/distill_filter_5m",
+            "retain_targets": [
+                [
+                    "core"
+                ]
+            ],
+            "teacher": "filter_20m",
+            "teacher_type": "filtering",
+            "specialist": {
+                "lr": 0.0001,
+                "bs": 128,
+                "ctx_len": 512,
+                "acc_steps": 1,
+                "warmup_prc": 0.1,
+                "decay_prc": 0.1,
+                "epochs": 1,
+                "adam_betas": [
+                    0.9,
+                    0.95
+                ],
+                "seed": 42,
+                "num_tokens": -1
+            },
+            "alpha": 1.0,
+            "temperature": 1.0
+        },
+        {
+            "model": {
+                "arch": "base",
+                "tokenizer": "TokenizersBackend(name_or_path='SimpleStories/SimpleStories-1.25M', vocab_size=4096, model_max_length=1000000000000000019884624838656, padding_side='right', truncation_side='right', special_tokens={'eos_token': '[EOS]', 'unk_token': '[UNK]'}, added_tokens_decoder={\n\t0: AddedToken(\"[UNK]\", rstrip=False, lstrip=False, single_word=False, normalized=False, special=True),\n\t1: AddedToken(\"[EOS]\", rstrip=False, lstrip=False, single_word=False, normalized=False, special=True),\n})",
+                "ctx_len": 512,
+                "vocab_size": 4096,
+                "num_layers": 5,
+                "num_heads": 8,
+                "num_key_value": 2,
+                "attn_bias": true,
+                "eos_token_id": 1,
+                "embed_dim": 256,
+                "mlp_dim": 1024
+            },
+            "train": {
+                "lr": 0.0001,
+                "bs": 64,
+                "ctx_len": 512,
+                "acc_steps": 1,
+                "warmup_prc": 0.1,
+                "decay_prc": 0.1,
+                "epochs": 1,
+                "adam_betas": [
+                    0.9,
+                    0.95
+                ],
+                "seed": 1,
+                "num_tokens": 111086080
+            },
+            "eval": {
+                "run": true,
+                "sample": false,
+                "elicit": true,
+                "num_train_evals": 200
+            },
+            "name": "distill_diff_5m",
+            "res_dir": "/workspace/modular-pretraining/results/distill/seed_1/20261005064940764364/distill_diff_5m",
+            "retain_targets": [
+                [
+                    "core"
+                ]
+            ],
+            "teacher": "base_20m",
+            "teacher_type": "difference",
+            "specialist": {
+                "lr": 2.5e-05,
+                "bs": 64,
+                "ctx_len": 512,
+                "acc_steps": 1,
+                "warmup_prc": 0.1,
+                "decay_prc": 0.1,
+                "epochs": 1,
+                "adam_betas": [
+                    0.9,
+                    0.95
+                ],
+                "seed": 1,
+                "num_tokens": 9624764
+            },
+            "alpha": 1.0,
+            "temperature": 1.0
+        }
+    ],
+    "data": {
+        "dirs": [
+            "/workspace/modular-pretraining/src/data/stories"
+        ],
+        "core": [
+            "alien-encounters",
+            "bygone-eras",
+            "cultural-traditions",
+            "dinosaurs",
+            "dream-worlds",
+            "enchanted-forests",
+            "fairy-tales",
+            "fantasy-worlds",
+            "gardens",
+            "giant-creatures",
+            "haunted-places",
+            "hidden-treasures",
+            "holidays",
+            "invisibility",
+            "island-adventures",
+            "living-objects",
+            "lost-cities",
+            "lost-civilizations",
+            "magical-lands",
+            "magical-objects",
+            "miniature-worlds",
+            "mysterious-maps",
+            "mystical-creatures",
+            "outer-space",
+            "pirates",
+            "riddles",
+            "robots-and-technology",
+            "royal-kingdoms",
+            "school-life",
+            "seasonal-changes",
+            "secret-societies",
+            "shape-shifting",
+            "sibling-rivalry",
+            "snowy-adventures",
+            "space-exploration",
+            "sports",
+            "subterranean-worlds",
+            "superheroes",
+            "talking-animals",
+            "the-arts",
+            "the-sky",
+            "time-travel",
+            "treasure-hunts",
+            "undercover-missions",
+            "underwater-adventures",
+            "unusual-vehicles",
+            "virtual-worlds"
+        ],
+        "aux": [
+            "a-deadline-or-time-limit"
+        ],
+        "datasets": {
+            "a-deadline-or-time-limit": {
+                "train": [
+                    "/workspace/modular-pretraining/src/data/stories/a-deadline-or-time-limit_train.bin"
+                ],
+                "test": [
+                    "/workspace/modular-pretraining/src/data/stories/a-deadline-or-time-limit_test.bin"
+                ]
+            },
+            "alien-encounters": {
+                "train": [
+                    "/workspace/modular-pretraining/src/data/stories/alien-encounters_train.bin"
+                ],
+                "test": [
+                    "/workspace/modular-pretraining/src/data/stories/alien-encounters_test.bin"
+                ]
+            },
+            "bygone-eras": {
+                "train": [
+                    "/workspace/modular-pretraining/src/data/stories/bygone-eras_train.bin"
+                ],
+                "test": [
+                    "/workspace/modular-pretraining/src/data/stories/bygone-eras_test.bin"
+                ]
+            },
+            "cultural-traditions": {
+                "train": [
+                    "/workspace/modular-pretraining/src/data/stories/cultural-traditions_train.bin"
+                ],
+                "test": [
+                    "/workspace/modular-pretraining/src/data/stories/cultural-traditions_test.bin"
+                ]
+            },
+            "dinosaurs": {
+                "train": [
+                    "/workspace/modular-pretraining/src/data/stories/dinosaurs_train.bin"
+                ],
+                "test": [
+                    "/workspace/modular-pretraining/src/data/stories/dinosaurs_test.bin"
+                ]
+            },
+            "dream-worlds": {
+                "train": [
+                    "/workspace/modular-pretraining/src/data/stories/dream-worlds_train.bin"
+                ],
+                "test": [
+                    "/workspace/modular-pretraining/src/data/stories/dream-worlds_test.bin"
+                ]
+            },
+            "enchanted-forests": {
+                "train": [
+                    "/workspace/modular-pretraining/src/data/stories/enchanted-forests_train.bin"
+                ],
+                "test": [
+                    "/workspace/modular-pretraining/src/data/stories/enchanted-forests_test.bin"
+                ]
+            },
+            "fairy-tales": {
+                "train": [
+                    "/workspace/modular-pretraining/src/data/stories/fairy-tales_train.bin"
+                ],
+                "test": [
+                    "/workspace/modular-pretraining/src/data/stories/fairy-tales_test.bin"
+                ]
+            },
+            "fantasy-worlds": {
+                "train": [
+                    "/workspace/modular-pretraining/src/data/stories/fantasy-worlds_train.bin"
+                ],
+                "test": [
+                    "/workspace/modular-pretraining/src/data/stories/fantasy-worlds_test.bin"
+                ]
+            },
+            "gardens": {
+                "train": [
+                    "/workspace/modular-pretraining/src/data/stories/gardens_train.bin"
+                ],
+                "test": [
+                    "/workspace/modular-pretraining/src/data/stories/gardens_test.bin"
+                ]
+            },
+            "giant-creatures": {
+                "train": [
+                    "/workspace/modular-pretraining/src/data/stories/giant-creatures_train.bin"
+                ],
+                "test": [
+                    "/workspace/modular-pretraining/src/data/stories/giant-creatures_test.bin"
+                ]
+            },
+            "haunted-places": {
+                "train": [
+                    "/workspace/modular-pretraining/src/data/stories/haunted-places_train.bin"
+                ],
+                "test": [
+                    "/workspace/modular-pretraining/src/data/stories/haunted-places_test.bin"
+                ]
+            },
+            "hidden-treasures": {
+                "train": [
+                    "/workspace/modular-pretraining/src/data/stories/hidden-treasures_train.bin"
+                ],
+                "test": [
+                    "/workspace/modular-pretraining/src/data/stories/hidden-treasures_test.bin"
+                ]
+            },
+            "holidays": {
+                "train": [
+                    "/workspace/modular-pretraining/src/data/stories/holidays_train.bin"
+                ],
+                "test": [
+                    "/workspace/modular-pretraining/src/data/stories/holidays_test.bin"
+                ]
+            },
+            "invisibility": {
+                "train": [
+                    "/workspace/modular-pretraining/src/data/stories/invisibility_train.bin"
+                ],
+                "test": [
+                    "/workspace/modular-pretraining/src/data/stories/invisibility_test.bin"
+                ]
+            },
+            "island-adventures": {
+                "train": [
+                    "/workspace/modular-pretraining/src/data/stories/island-adventures_train.bin"
+                ],
+                "test": [
+                    "/workspace/modular-pretraining/src/data/stories/island-adventures_test.bin"
+                ]
+            },
+            "living-objects": {
+                "train": [
+                    "/workspace/modular-pretraining/src/data/stories/living-objects_train.bin"
+                ],
+                "test": [
+                    "/workspace/modular-pretraining/src/data/stories/living-objects_test.bin"
+                ]
+            },
+            "lost-cities": {
+                "train": [
+                    "/workspace/modular-pretraining/src/data/stories/lost-cities_train.bin"
+                ],
+                "test": [
+                    "/workspace/modular-pretraining/src/data/stories/lost-cities_test.bin"
+                ]
+            },
+            "lost-civilizations": {
+                "train": [
+                    "/workspace/modular-pretraining/src/data/stories/lost-civilizations_train.bin"
+                ],
+                "test": [
+                    "/workspace/modular-pretraining/src/data/stories/lost-civilizations_test.bin"
+                ]
+            },
+            "magical-lands": {
+                "train": [
+                    "/workspace/modular-pretraining/src/data/stories/magical-lands_train.bin"
+                ],
+                "test": [
+                    "/workspace/modular-pretraining/src/data/stories/magical-lands_test.bin"
+                ]
+            },
+            "magical-objects": {
+                "train": [
+                    "/workspace/modular-pretraining/src/data/stories/magical-objects_train.bin"
+                ],
+                "test": [
+                    "/workspace/modular-pretraining/src/data/stories/magical-objects_test.bin"
+                ]
+            },
+            "miniature-worlds": {
+                "train": [
+                    "/workspace/modular-pretraining/src/data/stories/miniature-worlds_train.bin"
+                ],
+                "test": [
+                    "/workspace/modular-pretraining/src/data/stories/miniature-worlds_test.bin"
+                ]
+            },
+            "mysterious-maps": {
+                "train": [
+                    "/workspace/modular-pretraining/src/data/stories/mysterious-maps_train.bin"
+                ],
+                "test": [
+                    "/workspace/modular-pretraining/src/data/stories/mysterious-maps_test.bin"
+                ]
+            },
+            "mystical-creatures": {
+                "train": [
+                    "/workspace/modular-pretraining/src/data/stories/mystical-creatures_train.bin"
+                ],
+                "test": [
+                    "/workspace/modular-pretraining/src/data/stories/mystical-creatures_test.bin"
+                ]
+            },
+            "outer-space": {
+                "train": [
+                    "/workspace/modular-pretraining/src/data/stories/outer-space_train.bin"
+                ],
+                "test": [
+                    "/workspace/modular-pretraining/src/data/stories/outer-space_test.bin"
+                ]
+            },
+            "pirates": {
+                "train": [
+                    "/workspace/modular-pretraining/src/data/stories/pirates_train.bin"
+                ],
+                "test": [
+                    "/workspace/modular-pretraining/src/data/stories/pirates_test.bin"
+                ]
+            },
+            "riddles": {
+                "train": [
+                    "/workspace/modular-pretraining/src/data/stories/riddles_train.bin"
+                ],
+                "test": [
+                    "/workspace/modular-pretraining/src/data/stories/riddles_test.bin"
+                ]
+            },
+            "robots-and-technology": {
+                "train": [
+                    "/workspace/modular-pretraining/src/data/stories/robots-and-technology_train.bin"
+                ],
+                "test": [
+                    "/workspace/modular-pretraining/src/data/stories/robots-and-technology_test.bin"
+                ]
+            },
+            "royal-kingdoms": {
+                "train": [
+                    "/workspace/modular-pretraining/src/data/stories/royal-kingdoms_train.bin"
+                ],
+                "test": [
+                    "/workspace/modular-pretraining/src/data/stories/royal-kingdoms_test.bin"
+                ]
+            },
+            "school-life": {
+                "train": [
+                    "/workspace/modular-pretraining/src/data/stories/school-life_train.bin"
+                ],
+                "test": [
+                    "/workspace/modular-pretraining/src/data/stories/school-life_test.bin"
+                ]
+            },
+            "seasonal-changes": {
+                "train": [
+                    "/workspace/modular-pretraining/src/data/stories/seasonal-changes_train.bin"
+                ],
+                "test": [
+                    "/workspace/modular-pretraining/src/data/stories/seasonal-changes_test.bin"
+                ]
+            },
+            "secret-societies": {
+                "train": [
+                    "/workspace/modular-pretraining/src/data/stories/secret-societies_train.bin"
+                ],
+                "test": [
+                    "/workspace/modular-pretraining/src/data/stories/secret-societies_test.bin"
+                ]
+            },
+            "shape-shifting": {
+                "train": [
+                    "/workspace/modular-pretraining/src/data/stories/shape-shifting_train.bin"
+                ],
+                "test": [
+                    "/workspace/modular-pretraining/src/data/stories/shape-shifting_test.bin"
+                ]
+            },
+            "sibling-rivalry": {
+                "train": [
+                    "/workspace/modular-pretraining/src/data/stories/sibling-rivalry_train.bin"
+                ],
+                "test": [
+                    "/workspace/modular-pretraining/src/data/stories/sibling-rivalry_test.bin"
+                ]
+            },
+            "snowy-adventures": {
+                "train": [
+                    "/workspace/modular-pretraining/src/data/stories/snowy-adventures_train.bin"
+                ],
+                "test": [
+                    "/workspace/modular-pretraining/src/data/stories/snowy-adventures_test.bin"
+                ]
+            },
+            "space-exploration": {
+                "train": [
+                    "/workspace/modular-pretraining/src/data/stories/space-exploration_train.bin"
+                ],
+                "test": [
+                    "/workspace/modular-pretraining/src/data/stories/space-exploration_test.bin"
+                ]
+            },
+            "sports": {
+                "train": [
+                    "/workspace/modular-pretraining/src/data/stories/sports_train.bin"
+                ],
+                "test": [
+                    "/workspace/modular-pretraining/src/data/stories/sports_test.bin"
+                ]
+            },
+            "subterranean-worlds": {
+                "train": [
+                    "/workspace/modular-pretraining/src/data/stories/subterranean-worlds_train.bin"
+                ],
+                "test": [
+                    "/workspace/modular-pretraining/src/data/stories/subterranean-worlds_test.bin"
+                ]
+            },
+            "superheroes": {
+                "train": [
+                    "/workspace/modular-pretraining/src/data/stories/superheroes_train.bin"
+                ],
+                "test": [
+                    "/workspace/modular-pretraining/src/data/stories/superheroes_test.bin"
+                ]
+            },
+            "talking-animals": {
+                "train": [
+                    "/workspace/modular-pretraining/src/data/stories/talking-animals_train.bin"
+                ],
+                "test": [
+                    "/workspace/modular-pretraining/src/data/stories/talking-animals_test.bin"
+                ]
+            },
+            "the-arts": {
+                "train": [
+                    "/workspace/modular-pretraining/src/data/stories/the-arts_train.bin"
+                ],
+                "test": [
+                    "/workspace/modular-pretraining/src/data/stories/the-arts_test.bin"
+                ]
+            },
+            "the-sky": {
+                "train": [
+                    "/workspace/modular-pretraining/src/data/stories/the-sky_train.bin"
+                ],
+                "test": [
+                    "/workspace/modular-pretraining/src/data/stories/the-sky_test.bin"
+                ]
+            },
+            "time-travel": {
+                "train": [
+                    "/workspace/modular-pretraining/src/data/stories/time-travel_train.bin"
+                ],
+                "test": [
+                    "/workspace/modular-pretraining/src/data/stories/time-travel_test.bin"
+                ]
+            },
+            "treasure-hunts": {
+                "train": [
+                    "/workspace/modular-pretraining/src/data/stories/treasure-hunts_train.bin"
+                ],
+                "test": [
+                    "/workspace/modular-pretraining/src/data/stories/treasure-hunts_test.bin"
+                ]
+            },
+            "undercover-missions": {
+                "train": [
+                    "/workspace/modular-pretraining/src/data/stories/undercover-missions_train.bin"
+                ],
+                "test": [
+                    "/workspace/modular-pretraining/src/data/stories/undercover-missions_test.bin"
+                ]
+            },
+            "underwater-adventures": {
+                "train": [
+                    "/workspace/modular-pretraining/src/data/stories/underwater-adventures_train.bin"
+                ],
+                "test": [
+                    "/workspace/modular-pretraining/src/data/stories/underwater-adventures_test.bin"
+                ]
+            },
+            "unusual-vehicles": {
+                "train": [
+                    "/workspace/modular-pretraining/src/data/stories/unusual-vehicles_train.bin"
+                ],
+                "test": [
+                    "/workspace/modular-pretraining/src/data/stories/unusual-vehicles_test.bin"
+                ]
+            },
+            "virtual-worlds": {
+                "train": [
+                    "/workspace/modular-pretraining/src/data/stories/virtual-worlds_train.bin"
+                ],
+                "test": [
+                    "/workspace/modular-pretraining/src/data/stories/virtual-worlds_test.bin"
+                ]
+            },
+            "core": {
+                "train": [
+                    "/workspace/modular-pretraining/src/data/stories/alien-encounters_train.bin",
+                    "/workspace/modular-pretraining/src/data/stories/bygone-eras_train.bin",
+                    "/workspace/modular-pretraining/src/data/stories/cultural-traditions_train.bin",
+                    "/workspace/modular-pretraining/src/data/stories/dinosaurs_train.bin",
+                    "/workspace/modular-pretraining/src/data/stories/dream-worlds_train.bin",
+                    "/workspace/modular-pretraining/src/data/stories/enchanted-forests_train.bin",
+                    "/workspace/modular-pretraining/src/data/stories/fairy-tales_train.bin",
+                    "/workspace/modular-pretraining/src/data/stories/fantasy-worlds_train.bin",
+                    "/workspace/modular-pretraining/src/data/stories/gardens_train.bin",
+                    "/workspace/modular-pretraining/src/data/stories/giant-creatures_train.bin",
+                    "/workspace/modular-pretraining/src/data/stories/haunted-places_train.bin",
+                    "/workspace/modular-pretraining/src/data/stories/hidden-treasures_train.bin",
+                    "/workspace/modular-pretraining/src/data/stories/holidays_train.bin",
+                    "/workspace/modular-pretraining/src/data/stories/invisibility_train.bin",
+                    "/workspace/modular-pretraining/src/data/stories/island-adventures_train.bin",
+                    "/workspace/modular-pretraining/src/data/stories/living-objects_train.bin",
+                    "/workspace/modular-pretraining/src/data/stories/lost-cities_train.bin",
+                    "/workspace/modular-pretraining/src/data/stories/lost-civilizations_train.bin",
+                    "/workspace/modular-pretraining/src/data/stories/magical-lands_train.bin",
+                    "/workspace/modular-pretraining/src/data/stories/magical-objects_train.bin",
+                    "/workspace/modular-pretraining/src/data/stories/miniature-worlds_train.bin",
+                    "/workspace/modular-pretraining/src/data/stories/mysterious-maps_train.bin",
+                    "/workspace/modular-pretraining/src/data/stories/mystical-creatures_train.bin",
+                    "/workspace/modular-pretraining/src/data/stories/outer-space_train.bin",
+                    "/workspace/modular-pretraining/src/data/stories/pirates_train.bin",
+                    "/workspace/modular-pretraining/src/data/stories/riddles_train.bin",
+                    "/workspace/modular-pretraining/src/data/stories/robots-and-technology_train.bin",
+                    "/workspace/modular-pretraining/src/data/stories/royal-kingdoms_train.bin",
+                    "/workspace/modular-pretraining/src/data/stories/school-life_train.bin",
+                    "/workspace/modular-pretraining/src/data/stories/seasonal-changes_train.bin",
+                    "/workspace/modular-pretraining/src/data/stories/secret-societies_train.bin",
+                    "/workspace/modular-pretraining/src/data/stories/shape-shifting_train.bin",
+                    "/workspace/modular-pretraining/src/data/stories/sibling-rivalry_train.bin",
+                    "/workspace/modular-pretraining/src/data/stories/snowy-adventures_train.bin",
+                    "/workspace/modular-pretraining/src/data/stories/space-exploration_train.bin",
+                    "/workspace/modular-pretraining/src/data/stories/sports_train.bin",
+                    "/workspace/modular-pretraining/src/data/stories/subterranean-worlds_train.bin",
+                    "/workspace/modular-pretraining/src/data/stories/superheroes_train.bin",
+                    "/workspace/modular-pretraining/src/data/stories/talking-animals_train.bin",
+                    "/workspace/modular-pretraining/src/data/stories/the-arts_train.bin",
+                    "/workspace/modular-pretraining/src/data/stories/the-sky_train.bin",
+                    "/workspace/modular-pretraining/src/data/stories/time-travel_train.bin",
+                    "/workspace/modular-pretraining/src/data/stories/treasure-hunts_train.bin",
+                    "/workspace/modular-pretraining/src/data/stories/undercover-missions_train.bin",
+                    "/workspace/modular-pretraining/src/data/stories/underwater-adventures_train.bin",
+                    "/workspace/modular-pretraining/src/data/stories/unusual-vehicles_train.bin",
+                    "/workspace/modular-pretraining/src/data/stories/virtual-worlds_train.bin"
+                ],
+                "test": [
+                    "/workspace/modular-pretraining/src/data/stories/alien-encounters_test.bin",
+                    "/workspace/modular-pretraining/src/data/stories/bygone-eras_test.bin",
+                    "/workspace/modular-pretraining/src/data/stories/cultural-traditions_test.bin",
+                    "/workspace/modular-pretraining/src/data/stories/dinosaurs_test.bin",
+                    "/workspace/modular-pretraining/src/data/stories/dream-worlds_test.bin",
+                    "/workspace/modular-pretraining/src/data/stories/enchanted-forests_test.bin",
+                    "/workspace/modular-pretraining/src/data/stories/fairy-tales_test.bin",
+                    "/workspace/modular-pretraining/src/data/stories/fantasy-worlds_test.bin",
+                    "/workspace/modular-pretraining/src/data/stories/gardens_test.bin",
+                    "/workspace/modular-pretraining/src/data/stories/giant-creatures_test.bin",
+                    "/workspace/modular-pretraining/src/data/stories/haunted-places_test.bin",
+                    "/workspace/modular-pretraining/src/data/stories/hidden-treasures_test.bin",
+                    "/workspace/modular-pretraining/src/data/stories/holidays_test.bin",
+                    "/workspace/modular-pretraining/src/data/stories/invisibility_test.bin",
+                    "/workspace/modular-pretraining/src/data/stories/island-adventures_test.bin",
+                    "/workspace/modular-pretraining/src/data/stories/living-objects_test.bin",
+                    "/workspace/modular-pretraining/src/data/stories/lost-cities_test.bin",
+                    "/workspace/modular-pretraining/src/data/stories/lost-civilizations_test.bin",
+                    "/workspace/modular-pretraining/src/data/stories/magical-lands_test.bin",
+                    "/workspace/modular-pretraining/src/data/stories/magical-objects_test.bin",
+                    "/workspace/modular-pretraining/src/data/stories/miniature-worlds_test.bin",
+                    "/workspace/modular-pretraining/src/data/stories/mysterious-maps_test.bin",
+                    "/workspace/modular-pretraining/src/data/stories/mystical-creatures_test.bin",
+                    "/workspace/modular-pretraining/src/data/stories/outer-space_test.bin",
+                    "/workspace/modular-pretraining/src/data/stories/pirates_test.bin",
+                    "/workspace/modular-pretraining/src/data/stories/riddles_test.bin",
+                    "/workspace/modular-pretraining/src/data/stories/robots-and-technology_test.bin",
+                    "/workspace/modular-pretraining/src/data/stories/royal-kingdoms_test.bin",
+                    "/workspace/modular-pretraining/src/data/stories/school-life_test.bin",
+                    "/workspace/modular-pretraining/src/data/stories/seasonal-changes_test.bin",
+                    "/workspace/modular-pretraining/src/data/stories/secret-societies_test.bin",
+                    "/workspace/modular-pretraining/src/data/stories/shape-shifting_test.bin",
+                    "/workspace/modular-pretraining/src/data/stories/sibling-rivalry_test.bin",
+                    "/workspace/modular-pretraining/src/data/stories/snowy-adventures_test.bin",
+                    "/workspace/modular-pretraining/src/data/stories/space-exploration_test.bin",
+                    "/workspace/modular-pretraining/src/data/stories/sports_test.bin",
+                    "/workspace/modular-pretraining/src/data/stories/subterranean-worlds_test.bin",
+                    "/workspace/modular-pretraining/src/data/stories/superheroes_test.bin",
+                    "/workspace/modular-pretraining/src/data/stories/talking-animals_test.bin",
+                    "/workspace/modular-pretraining/src/data/stories/the-arts_test.bin",
+                    "/workspace/modular-pretraining/src/data/stories/the-sky_test.bin",
+                    "/workspace/modular-pretraining/src/data/stories/time-travel_test.bin",
+                    "/workspace/modular-pretraining/src/data/stories/treasure-hunts_test.bin",
+                    "/workspace/modular-pretraining/src/data/stories/undercover-missions_test.bin",
+                    "/workspace/modular-pretraining/src/data/stories/underwater-adventures_test.bin",
+                    "/workspace/modular-pretraining/src/data/stories/unusual-vehicles_test.bin",
+                    "/workspace/modular-pretraining/src/data/stories/virtual-worlds_test.bin"
+                ]
+            }
+        }
+    },
+    "compile": true,
+    "find_unused_parameters": false,
+    "is_ddp": true,
+    "log_level": "DEBUG",
+    "num_gpus": 2,
+    "process_id": 0,
+    "device": "cuda",
+    "logger": "<Logger training_20261005064940764364 (DEBUG)>",
+    "res_root": "/workspace/modular-pretraining/results/distill/seed_1",
+    "experiment_id": "20261005064940764364"
+}
+[GPU 0] [06:49:41] [INFO] Stage [base_20m] start: {"model": {"arch": "base", "tokenizer": "TokenizersBackend(name_or_path='SimpleStories/SimpleStories-1.25M', vocab_size=4096, model_max_length=1000000000000000019884624838656, padding_side='right', truncation_side='right', special_tokens={'eos_token': '[EOS]', 'unk_token': '[UNK]'}, added_tokens_decoder={\n\t0: AddedToken(\"[UNK]\", rstrip=False, lstrip=False, single_word=False, normalized=False, special=True),\n\t1: AddedToken(\"[EOS]\", rstrip=False, lstrip=False, single_word=False, normalized=False, special=True),\n})", "ctx_len": 512, "vocab_size": 4096, "num_layers": 9, "num_heads": 8, "num_key_value": 2, "attn_bias": true, "eos_token_id": 1, "embed_dim": 448, "mlp_dim": 1792}, "train": {"lr": 0.0001, "bs": 64, "ctx_len": 512, "acc_steps": 1, "warmup_prc": 0.1, "decay_prc": 0.1, "epochs": 1, "adam_betas": [0.9, 0.95], "seed": 1, "num_tokens": 453587840}, "eval": {"run": true, "sample": false, "elicit": false, "num_train_evals": 200}, "name": "base_20m", "res_dir": "/workspace/modular-pretraining/results/distill/seed_1/20261005064940764364/base_20m"}
+[GPU 0] [06:49:41] [INFO] BASELINE START
+[GPU 0] [06:49:42] [INFO] Initialized BaseTransformer with 22,679,392 total parameters
+[GPU 0] [06:49:42] [INFO] Compiling BaseTransformer with torch.compile...
+[GPU 0] [06:49:42] [INFO] ---- Begin Train | Train Labels: ['a-deadline-or-time-limit', 'core'] ----
+[GPU 0] [06:49:42] [INFO] num_total_steps: 6921
+[GPU 0] [06:49:42] [INFO] warmup_steps: 692
+[GPU 0] [06:49:42] [INFO] constant_steps: 5537
+[GPU 0] [06:49:42] [INFO] decay_steps: 692
+[GPU 0] [06:49:42] [INFO] LR Scheduler: Warmup Start
+[GPU 0] [06:50:10] [INFO] Step: 1, LR: 1.54e-07
+[GPU 0] [06:50:10] [INFO] Train Loss: 8.44
+[GPU 0] [06:50:10] [INFO] Val Loss: CORE: nan A-DEADLINE-OR-TIME-LIMIT: nan 
+[GPU 0] [06:52:03] [INFO] LR Scheduler: Constant Start
+[GPU 0] [06:52:51] [INFO] Step: 1000, LR: 1.00e-04
+[GPU 0] [06:52:51] [INFO] Train Loss: 3.59
+[GPU 0] [06:52:51] [INFO] Val Loss: CORE: 3.60 A-DEADLINE-OR-TIME-LIMIT: 3.71 
+[GPU 0] [06:55:27] [INFO] Step: 2000, LR: 1.00e-04
+[GPU 0] [06:55:27] [INFO] Train Loss: 3.16
+[GPU 0] [06:55:27] [INFO] Val Loss: CORE: 3.16 A-DEADLINE-OR-TIME-LIMIT: 3.28 
+[GPU 0] [06:58:00] [INFO] Step: 3000, LR: 1.00e-04
+[GPU 0] [06:58:00] [INFO] Train Loss: 2.98
+[GPU 0] [06:58:00] [INFO] Val Loss: CORE: 2.99 A-DEADLINE-OR-TIME-LIMIT: 3.12 
+[GPU 0] [07:00:35] [INFO] Step: 4000, LR: 1.00e-04
+[GPU 0] [07:00:35] [INFO] Train Loss: 2.89
+[GPU 0] [07:00:35] [INFO] Val Loss: CORE: 2.89 A-DEADLINE-OR-TIME-LIMIT: 3.01 
+[GPU 0] [07:03:08] [INFO] Step: 5000, LR: 1.00e-04
+[GPU 0] [07:03:08] [INFO] Train Loss: 2.83
+[GPU 0] [07:03:08] [INFO] Val Loss: CORE: 2.81 A-DEADLINE-OR-TIME-LIMIT: 2.94 
+[GPU 0] [07:05:44] [INFO] Step: 6000, LR: 1.00e-04
+[GPU 0] [07:05:44] [INFO] Train Loss: 2.76
+[GPU 0] [07:05:44] [INFO] Val Loss: CORE: 2.75 A-DEADLINE-OR-TIME-LIMIT: 2.88 
+[GPU 0] [07:06:18] [INFO] LR Scheduler: Decay Start
+[GPU 0] [07:08:06] [INFO] Step: 6921, LR: 1.00e-08
+[GPU 0] [07:08:06] [INFO] Train Loss: 2.72
+[GPU 0] [07:08:06] [INFO] Val Loss: CORE: 2.70 A-DEADLINE-OR-TIME-LIMIT: 2.84 
+[GPU 0] [07:08:06] [INFO] ---- Begin Eval ----
+[GPU 0] [07:08:06] [INFO] Data: core | Experts: None
+[GPU 0] [07:08:31] [INFO] loss: 2.70728993
+[GPU 0] [07:08:31] [INFO] Data: a-deadline-or-time-limit | Experts: None
+[GPU 0] [07:08:32] [INFO] loss: 2.83632803
+[GPU 0] [07:08:32] [INFO] Stage [filter_20m] start: {"model": {"arch": "base", "tokenizer": "TokenizersBackend(name_or_path='SimpleStories/SimpleStories-1.25M', vocab_size=4096, model_max_length=1000000000000000019884624838656, padding_side='right', truncation_side='right', special_tokens={'eos_token': '[EOS]', 'unk_token': '[UNK]'}, added_tokens_decoder={\n\t0: AddedToken(\"[UNK]\", rstrip=False, lstrip=False, single_word=False, normalized=False, special=True),\n\t1: AddedToken(\"[EOS]\", rstrip=False, lstrip=False, single_word=False, normalized=False, special=True),\n})", "ctx_len": 512, "vocab_size": 4096, "num_layers": 9, "num_heads": 8, "num_key_value": 2, "attn_bias": true, "eos_token_id": 1, "embed_dim": 448, "mlp_dim": 1792}, "train": {"lr": 0.0001, "bs": 64, "ctx_len": 512, "acc_steps": 1, "warmup_prc": 0.1, "decay_prc": 0.1, "epochs": 1, "adam_betas": [0.9, 0.95], "seed": 1, "num_tokens": 453587840}, "eval": {"run": true, "sample": false, "elicit": true, "num_train_evals": 200}, "name": "filter_20m", "res_dir": "/workspace/modular-pretraining/results/distill/seed_1/20261005064940764364/filter_20m", "retain_targets": [["core"]]}
+[GPU 0] [07:08:32] [INFO] FILTERING START
+[GPU 0] [07:08:32] [INFO] Using stage-level retain_targets override (1 targets)
+[GPU 0] [07:08:32] [INFO] Filtering: retaining ['core'], removing ['a-deadline-or-time-limit']
+[GPU 0] [07:08:32] [INFO] Initialized BaseTransformer with 22,679,392 total parameters
+[GPU 0] [07:08:32] [INFO] Compiling BaseTransformer with torch.compile...
+[GPU 0] [07:08:32] [INFO] ---- Begin Train | Train Labels: ['core'] ----
+[GPU 0] [07:08:32] [INFO] num_total_steps: 6921
+[GPU 0] [07:08:32] [INFO] warmup_steps: 692
+[GPU 0] [07:08:32] [INFO] constant_steps: 5537
+[GPU 0] [07:08:32] [INFO] decay_steps: 692
+[GPU 0] [07:08:32] [INFO] LR Scheduler: Warmup Start
+[GPU 0] [07:08:32] [INFO] Step: 1, LR: 1.54e-07
+[GPU 0] [07:08:32] [INFO] Train Loss: 8.38
+[GPU 0] [07:08:32] [INFO] Val Loss: CORE: nan A-DEADLINE-OR-TIME-LIMIT: nan 
+[GPU 0] [07:10:18] [INFO] LR Scheduler: Constant Start
+[GPU 0] [07:11:06] [INFO] Step: 1000, LR: 1.00e-04
+[GPU 0] [07:11:06] [INFO] Train Loss: 3.58
+[GPU 0] [07:11:06] [INFO] Val Loss: CORE: 3.59 A-DEADLINE-OR-TIME-LIMIT: 3.73 
+[GPU 0] [07:13:41] [INFO] Step: 2000, LR: 1.00e-04
+[GPU 0] [07:13:41] [INFO] Train Loss: 3.16
+[GPU 0] [07:13:41] [INFO] Val Loss: CORE: 3.15 A-DEADLINE-OR-TIME-LIMIT: 3.32 
+[GPU 0] [07:16:14] [INFO] Step: 3000, LR: 1.00e-04
+[GPU 0] [07:16:14] [INFO] Train Loss: 2.98
+[GPU 0] [07:16:14] [INFO] Val Loss: CORE: 3.00 A-DEADLINE-OR-TIME-LIMIT: 3.18 
+[GPU 0] [07:18:50] [INFO] Step: 4000, LR: 1.00e-04
+[GPU 0] [07:18:50] [INFO] Train Loss: 2.87
+[GPU 0] [07:18:50] [INFO] Val Loss: CORE: 2.88 A-DEADLINE-OR-TIME-LIMIT: 3.07 
+[GPU 0] [07:21:23] [INFO] Step: 5000, LR: 1.00e-04
+[GPU 0] [07:21:23] [INFO] Train Loss: 2.81
+[GPU 0] [07:21:23] [INFO] Val Loss: CORE: 2.81 A-DEADLINE-OR-TIME-LIMIT: 3.00 
+[GPU 0] [07:23:58] [INFO] Step: 6000, LR: 1.00e-04
+[GPU 0] [07:23:58] [INFO] Train Loss: 2.73
+[GPU 0] [07:23:58] [INFO] Val Loss: CORE: 2.75 A-DEADLINE-OR-TIME-LIMIT: 2.95 
+[GPU 0] [07:24:32] [INFO] LR Scheduler: Decay Start
+[GPU 0] [07:26:19] [INFO] Step: 6921, LR: 1.00e-08
+[GPU 0] [07:26:19] [INFO] Train Loss: 2.72
+[GPU 0] [07:26:19] [INFO] Val Loss: CORE: 2.70 A-DEADLINE-OR-TIME-LIMIT: 2.90 
+[GPU 0] [07:26:19] [INFO] ---- Begin Eval ----
+[GPU 0] [07:26:19] [INFO] Data: core | Experts: None
+[GPU 0] [07:26:44] [INFO] loss: 2.70524645
+[GPU 0] [07:26:44] [INFO] Data: a-deadline-or-time-limit | Experts: None
+[GPU 0] [07:26:45] [INFO] loss: 2.90039062
+[GPU 0] [07:26:45] [INFO] FILTERING - ADVERSARIAL FT START
+[GPU 0] [07:26:45] [INFO] Compiling BaseTransformer with torch.compile...
+[GPU 0] [07:26:45] [INFO] ---- Begin FT | Experts: None | Data: ['a-deadline-or-time-limit'] ----
+[GPU 0] [07:26:45] [DEBUG] num_seq: 512, num_rounds: 200, patience: 10
+[GPU 0] [07:26:45] [WARNING] Resampling ['a-deadline-or-time-limit'] (train) to fill the token budget: 22,705 -> 885,888 seqs (39.02x)
+[GPU 0] [07:26:45] [DEBUG] 4 micro-batches of 64 seqs per rank
+[GPU 0] [07:26:46] [INFO] New best validation loss: 2.9707 @ step 0
+[GPU 0] [07:26:47] [INFO] New best validation loss: 2.9133 @ step 1
+[GPU 0] [07:26:48] [INFO] New best validation loss: 2.8984 @ step 2
+[GPU 0] [07:26:49] [INFO] New best validation loss: 2.8973 @ step 3
+[GPU 0] [07:26:50] [INFO] New best validation loss: 2.8953 @ step 4
+[GPU 0] [07:26:51] [INFO] New best validation loss: 2.8918 @ step 5
+[GPU 0] [07:26:51] [INFO] New best validation loss: 2.8852 @ step 6
+[GPU 0] [07:26:52] [INFO] New best validation loss: 2.8809 @ step 7
+[GPU 0] [07:26:53] [INFO] New best validation loss: 2.8785 @ step 8
+[GPU 0] [07:26:54] [INFO] New best validation loss: 2.8773 @ step 9
+[GPU 0] [07:26:55] [INFO] New best validation loss: 2.8766 @ step 10
+[GPU 0] [07:26:56] [INFO] New best validation loss: 2.8762 @ step 11
+[GPU 0] [07:26:57] [INFO] New best validation loss: 2.8746 @ step 12
+[GPU 0] [07:26:58] [INFO] New best validation loss: 2.8723 @ step 13
+[GPU 0] [07:26:58] [INFO] New best validation loss: 2.8695 @ step 14
+[GPU 0] [07:26:59] [INFO] New best validation loss: 2.8691 @ step 15
+[GPU 0] [07:27:00] [INFO] New best validation loss: 2.8668 @ step 16
+[GPU 0] [07:27:01] [INFO] New best validation loss: 2.8648 @ step 17
+[GPU 0] [07:27:02] [INFO] New best validation loss: 2.8633 @ step 18
+[GPU 0] [07:27:03] [INFO] New best validation loss: 2.8629 @ step 19
+[GPU 0] [07:27:04] [INFO] New best validation loss: 2.8625 @ step 20
+[GPU 0] [07:27:05] [INFO] New best validation loss: 2.8625 @ step 21
+[GPU 0] [07:27:06] [INFO] New best validation loss: 2.8617 @ step 22
+[GPU 0] [07:27:06] [INFO] New best validation loss: 2.8617 @ step 23
+[GPU 0] [07:27:07] [INFO] New best validation loss: 2.8605 @ step 24
+[GPU 0] [07:27:08] [INFO] New best validation loss: 2.8586 @ step 25
+[GPU 0] [07:27:09] [INFO] New best validation loss: 2.8570 @ step 26
+[GPU 0] [07:27:10] [INFO] New best validation loss: 2.8566 @ step 27
+[GPU 0] [07:27:11] [INFO] New best validation loss: 2.8563 @ step 28
+[GPU 0] [07:27:12] [INFO] New best validation loss: 2.8555 @ step 29
+[GPU 0] [07:27:13] [INFO] New best validation loss: 2.8547 @ step 30
+[GPU 0] [07:27:14] [INFO] New best validation loss: 2.8535 @ step 31
+[GPU 0] [07:27:14] [INFO] New best validation loss: 2.8527 @ step 32
+[GPU 0] [07:27:15] [INFO] New best validation loss: 2.8527 @ step 33
+[GPU 0] [07:27:16] [INFO] New best validation loss: 2.8527 @ step 34
+[GPU 0] [07:27:17] [INFO] New best validation loss: 2.8516 @ step 35
+[GPU 0] [07:27:18] [INFO] New best validation loss: 2.8512 @ step 36
+[GPU 0] [07:27:19] [INFO] New best validation loss: 2.8508 @ step 37
+[GPU 0] [07:27:20] [INFO] New best validation loss: 2.8504 @ step 38
+[GPU 0] [07:27:21] [INFO] New best validation loss: 2.8496 @ step 39
+[GPU 0] [07:27:22] [INFO] New best validation loss: 2.8492 @ step 40
+[GPU 0] [07:27:22] [INFO] New best validation loss: 2.8484 @ step 41
+[GPU 0] [07:27:23] [INFO] New best validation loss: 2.8480 @ step 42
+[GPU 0] [07:27:24] [INFO] New best validation loss: 2.8480 @ step 43
+[GPU 0] [07:27:25] [INFO] New best validation loss: 2.8469 @ step 44
+[GPU 0] [07:27:26] [INFO] New best validation loss: 2.8469 @ step 45
+[GPU 0] [07:27:27] [INFO] New best validation loss: 2.8469 @ step 46
+[GPU 0] [07:27:28] [INFO] New best validation loss: 2.8469 @ step 47
+[GPU 0] [07:27:29] [INFO] New best validation loss: 2.8465 @ step 48
+[GPU 0] [07:27:29] [INFO] New best validation loss: 2.8465 @ step 49
+[GPU 0] [07:27:30] [INFO] New best validation loss: 2.8457 @ step 50
+[GPU 0] [07:27:31] [INFO] New best validation loss: 2.8457 @ step 51
+[GPU 0] [07:27:32] [INFO] New best validation loss: 2.8457 @ step 52
+[GPU 0] [07:27:33] [INFO] New best validation loss: 2.8453 @ step 53
+[GPU 0] [07:27:34] [INFO] New best validation loss: 2.8449 @ step 54
+[GPU 0] [07:27:35] [INFO] New best validation loss: 2.8445 @ step 55
+[GPU 0] [07:27:36] [INFO] New best validation loss: 2.8441 @ step 56
+[GPU 0] [07:27:37] [INFO] New best validation loss: 2.8434 @ step 57
+[GPU 0] [07:27:38] [INFO] New best validation loss: 2.8426 @ step 58
+[GPU 0] [07:27:38] [INFO] New best validation loss: 2.8418 @ step 59
+[GPU 0] [07:27:39] [INFO] New best validation loss: 2.8414 @ step 60
+[GPU 0] [07:27:40] [INFO] New best validation loss: 2.8414 @ step 61
+[GPU 0] [07:27:41] [INFO] New best validation loss: 2.8414 @ step 62
+[GPU 0] [07:27:42] [INFO] New best validation loss: 2.8414 @ step 63
+[GPU 0] [07:27:43] [INFO] New best validation loss: 2.8414 @ step 64
+[GPU 0] [07:27:44] [INFO] New best validation loss: 2.8406 @ step 65
+[GPU 0] [07:27:45] [INFO] New best validation loss: 2.8402 @ step 66
+[GPU 0] [07:27:46] [INFO] New best validation loss: 2.8402 @ step 67
+[GPU 0] [07:27:46] [INFO] New best validation loss: 2.8398 @ step 68
+[GPU 0] [07:27:47] [INFO] New best validation loss: 2.8398 @ step 69
+[GPU 0] [07:27:48] [INFO] New best validation loss: 2.8398 @ step 70
+[GPU 0] [07:27:49] [INFO] New best validation loss: 2.8398 @ step 71
+[GPU 0] [07:27:50] [INFO] New best validation loss: 2.8387 @ step 72
+[GPU 0] [07:27:51] [INFO] New best validation loss: 2.8387 @ step 73
+[GPU 0] [07:27:52] [INFO] New best validation loss: 2.8387 @ step 74
+[GPU 0] [07:27:53] [INFO] New best validation loss: 2.8387 @ step 75
+[GPU 0] [07:27:54] [INFO] New best validation loss: 2.8387 @ step 76
+[GPU 0] [07:27:54] [INFO] New best validation loss: 2.8379 @ step 77
+[GPU 0] [07:27:56] [INFO] New best validation loss: 2.8375 @ step 79
+[GPU 0] [07:27:57] [INFO] New best validation loss: 2.8375 @ step 80
+[GPU 0] [07:27:58] [INFO] New best validation loss: 2.8375 @ step 81
+[GPU 0] [07:27:59] [INFO] New best validation loss: 2.8375 @ step 82
+[GPU 0] [07:28:00] [INFO] New best validation loss: 2.8375 @ step 83
+[GPU 0] [07:28:01] [INFO] New best validation loss: 2.8375 @ step 84
+[GPU 0] [07:28:02] [INFO] New best validation loss: 2.8375 @ step 85
+[GPU 0] [07:28:02] [INFO] New best validation loss: 2.8375 @ step 86
+[GPU 0] [07:28:03] [INFO] New best validation loss: 2.8367 @ step 87
+[GPU 0] [07:28:04] [INFO] New best validation loss: 2.8363 @ step 88
+[GPU 0] [07:28:05] [INFO] New best validation loss: 2.8363 @ step 89
+[GPU 0] [07:28:06] [INFO] New best validation loss: 2.8363 @ step 90
+[GPU 0] [07:28:07] [INFO] New best validation loss: 2.8363 @ step 91
+[GPU 0] [07:28:08] [INFO] New best validation loss: 2.8359 @ step 92
+[GPU 0] [07:28:09] [INFO] New best validation loss: 2.8355 @ step 93
+[GPU 0] [07:28:10] [INFO] New best validation loss: 2.8355 @ step 94
+[GPU 0] [07:28:10] [INFO] New best validation loss: 2.8352 @ step 95
+[GPU 0] [07:28:11] [INFO] New best validation loss: 2.8352 @ step 96
+[GPU 0] [07:28:12] [INFO] New best validation loss: 2.8348 @ step 97
+[GPU 0] [07:28:13] [INFO] New best validation loss: 2.8348 @ step 98
+[GPU 0] [07:28:14] [INFO] New best validation loss: 2.8348 @ step 99
+[GPU 0] [07:28:15] [INFO] New best validation loss: 2.8344 @ step 100
+[GPU 0] [07:28:16] [INFO] New best validation loss: 2.8344 @ step 101
+[GPU 0] [07:28:17] [INFO] New best validation loss: 2.8344 @ step 102
+[GPU 0] [07:28:17] [INFO] New best validation loss: 2.8340 @ step 103
+[GPU 0] [07:28:18] [INFO] New best validation loss: 2.8340 @ step 104
+[GPU 0] [07:28:19] [INFO] New best validation loss: 2.8340 @ step 105
+[GPU 0] [07:28:20] [INFO] New best validation loss: 2.8340 @ step 106
+[GPU 0] [07:28:21] [INFO] New best validation loss: 2.8340 @ step 107
+[GPU 0] [07:28:22] [INFO] New best validation loss: 2.8340 @ step 108
+[GPU 0] [07:28:23] [INFO] New best validation loss: 2.8340 @ step 109
+[GPU 0] [07:28:24] [INFO] New best validation loss: 2.8340 @ step 110
+[GPU 0] [07:28:25] [INFO] New best validation loss: 2.8340 @ step 111
+[GPU 0] [07:28:25] [INFO] New best validation loss: 2.8340 @ step 112
+[GPU 0] [07:28:26] [INFO] New best validation loss: 2.8340 @ step 113
+[GPU 0] [07:28:27] [INFO] New best validation loss: 2.8336 @ step 114
+[GPU 0] [07:28:28] [INFO] New best validation loss: 2.8336 @ step 115
+[GPU 0] [07:28:29] [INFO] New best validation loss: 2.8336 @ step 116
+[GPU 0] [07:28:30] [INFO] New best validation loss: 2.8328 @ step 117
+[GPU 0] [07:28:31] [INFO] New best validation loss: 2.8324 @ step 118
+[GPU 0] [07:28:33] [INFO] New best validation loss: 2.8324 @ step 120
+[GPU 0] [07:28:34] [INFO] New best validation loss: 2.8324 @ step 121
+[GPU 0] [07:28:34] [INFO] New best validation loss: 2.8324 @ step 122
+[GPU 0] [07:28:35] [INFO] New best validation loss: 2.8324 @ step 123
+[GPU 0] [07:28:36] [INFO] New best validation loss: 2.8324 @ step 124
+[GPU 0] [07:28:37] [INFO] New best validation loss: 2.8324 @ step 125
+[GPU 0] [07:28:38] [INFO] New best validation loss: 2.8324 @ step 126
+[GPU 0] [07:28:39] [INFO] New best validation loss: 2.8324 @ step 127
+[GPU 0] [07:28:40] [INFO] New best validation loss: 2.8324 @ step 128
+[GPU 0] [07:28:41] [INFO] New best validation loss: 2.8324 @ step 129
+[GPU 0] [07:28:42] [INFO] New best validation loss: 2.8324 @ step 130
+[GPU 0] [07:28:42] [INFO] New best validation loss: 2.8324 @ step 131
+[GPU 0] [07:28:43] [INFO] New best validation loss: 2.8324 @ step 132
+[GPU 0] [07:28:44] [INFO] New best validation loss: 2.8324 @ step 133
+[GPU 0] [07:28:45] [INFO] New best validation loss: 2.8324 @ step 134
+[GPU 0] [07:28:46] [INFO] New best validation loss: 2.8324 @ step 135
+[GPU 0] [07:28:47] [INFO] New best validation loss: 2.8324 @ step 136
+[GPU 0] [07:28:48] [INFO] New best validation loss: 2.8324 @ step 137
+[GPU 0] [07:28:49] [INFO] New best validation loss: 2.8324 @ step 138
+[GPU 0] [07:28:50] [INFO] New best validation loss: 2.8324 @ step 139
+[GPU 0] [07:28:50] [INFO] New best validation loss: 2.8320 @ step 140
+[GPU 0] [07:28:54] [INFO] New best validation loss: 2.8320 @ step 144
+[GPU 0] [07:28:56] [INFO] New best validation loss: 2.8320 @ step 146
+[GPU 0] [07:28:57] [INFO] New best validation loss: 2.8320 @ step 147
+[GPU 0] [07:28:58] [INFO] New best validation loss: 2.8320 @ step 149
+[GPU 0] [07:28:59] [INFO] New best validation loss: 2.8320 @ step 150
+[GPU 0] [07:29:00] [INFO] New best validation loss: 2.8320 @ step 151
+[GPU 0] [07:29:01] [INFO] New best validation loss: 2.8320 @ step 152
+[GPU 0] [07:29:02] [INFO] New best validation loss: 2.8320 @ step 153
+[GPU 0] [07:29:03] [INFO] New best validation loss: 2.8320 @ step 154
+[GPU 0] [07:29:04] [INFO] New best validation loss: 2.8320 @ step 155
+[GPU 0] [07:29:05] [INFO] New best validation loss: 2.8320 @ step 157
+[GPU 0] [07:29:06] [INFO] New best validation loss: 2.8320 @ step 158
+[GPU 0] [07:29:07] [INFO] New best validation loss: 2.8320 @ step 159
+[GPU 0] [07:29:08] [INFO] New best validation loss: 2.8320 @ step 160
+[GPU 0] [07:29:09] [INFO] New best validation loss: 2.8320 @ step 161
+[GPU 0] [07:29:10] [INFO] New best validation loss: 2.8320 @ step 162
+[GPU 0] [07:29:11] [INFO] New best validation loss: 2.8320 @ step 163
+[GPU 0] [07:29:12] [INFO] New best validation loss: 2.8320 @ step 164
+[GPU 0] [07:29:13] [INFO] New best validation loss: 2.8320 @ step 165
+[GPU 0] [07:29:13] [INFO] New best validation loss: 2.8320 @ step 166
+[GPU 0] [07:29:14] [INFO] New best validation loss: 2.8320 @ step 167
+[GPU 0] [07:29:15] [INFO] New best validation loss: 2.8320 @ step 168
+[GPU 0] [07:29:16] [INFO] New best validation loss: 2.8320 @ step 169
+[GPU 0] [07:29:17] [INFO] New best validation loss: 2.8320 @ step 170
+[GPU 0] [07:29:18] [INFO] New best validation loss: 2.8320 @ step 171
+[GPU 0] [07:29:27] [INFO] Stop FT @ 182: no val improvement for 10 steps
+[GPU 0] [07:29:27] [INFO] Wrote stats.jsonl entries at FT step 171 
+[GPU 0] [07:29:27] [INFO] Stage [base_5m] start: {"model": {"arch": "base", "tokenizer": "TokenizersBackend(name_or_path='SimpleStories/SimpleStories-1.25M', vocab_size=4096, model_max_length=1000000000000000019884624838656, padding_side='right', truncation_side='right', special_tokens={'eos_token': '[EOS]', 'unk_token': '[UNK]'}, added_tokens_decoder={\n\t0: AddedToken(\"[UNK]\", rstrip=False, lstrip=False, single_word=False, normalized=False, special=True),\n\t1: AddedToken(\"[EOS]\", rstrip=False, lstrip=False, single_word=False, normalized=False, special=True),\n})", "ctx_len": 512, "vocab_size": 4096, "num_layers": 5, "num_heads": 8, "num_key_value": 2, "attn_bias": true, "eos_token_id": 1, "embed_dim": 256, "mlp_dim": 1024}, "train": {"lr": 0.0001, "bs": 64, "ctx_len": 512, "acc_steps": 1, "warmup_prc": 0.1, "decay_prc": 0.1, "epochs": 1, "adam_betas": [0.9, 0.95], "seed": 1, "num_tokens": 111086080}, "eval": {"run": true, "sample": false, "elicit": false, "num_train_evals": 200}, "name": "base_5m", "res_dir": "/workspace/modular-pretraining/results/distill/seed_1/20261005064940764364/base_5m"}
+[GPU 0] [07:29:27] [INFO] BASELINE START
+[GPU 0] [07:29:27] [INFO] Initialized BaseTransformer with 5,554,304 total parameters
+[GPU 0] [07:29:27] [INFO] Compiling BaseTransformer with torch.compile...
+[GPU 0] [07:29:27] [INFO] ---- Begin Train | Train Labels: ['a-deadline-or-time-limit', 'core'] ----
+[GPU 0] [07:29:27] [INFO] num_total_steps: 1695
+[GPU 0] [07:29:27] [INFO] warmup_steps: 170
+[GPU 0] [07:29:27] [INFO] constant_steps: 1355
+[GPU 0] [07:29:27] [INFO] decay_steps: 170
+[GPU 0] [07:29:27] [INFO] LR Scheduler: Warmup Start
+[GPU 0] [07:29:37] [INFO] Step: 1, LR: 5.98e-07
+[GPU 0] [07:29:37] [INFO] Train Loss: 8.38
+[GPU 0] [07:29:37] [INFO] Val Loss: CORE: nan A-DEADLINE-OR-TIME-LIMIT: nan 
+[GPU 0] [07:30:06] [INFO] LR Scheduler: Constant Start
+[GPU 0] [07:32:03] [INFO] Step: 1000, LR: 1.00e-04
+[GPU 0] [07:32:03] [INFO] Train Loss: 3.89
+[GPU 0] [07:32:03] [INFO] Val Loss: CORE: 3.89 A-DEADLINE-OR-TIME-LIMIT: 3.99 
+[GPU 0] [07:33:17] [INFO] LR Scheduler: Decay Start
+[GPU 0] [07:33:41] [INFO] Step: 1695, LR: 1.00e-08
+[GPU 0] [07:33:41] [INFO] Train Loss: 3.76
+[GPU 0] [07:33:41] [INFO] Val Loss: CORE: 3.75 A-DEADLINE-OR-TIME-LIMIT: 3.85 
+[GPU 0] [07:33:41] [INFO] ---- Begin Eval ----
+[GPU 0] [07:33:41] [INFO] Data: core | Experts: None
+[GPU 0] [07:33:51] [INFO] loss: 3.74455881
+[GPU 0] [07:33:51] [INFO] Data: a-deadline-or-time-limit | Experts: None
+[GPU 0] [07:33:52] [INFO] loss: 3.85234380
+[GPU 0] [07:33:52] [INFO] Stage [filter_5m] start: {"model": {"arch": "base", "tokenizer": "TokenizersBackend(name_or_path='SimpleStories/SimpleStories-1.25M', vocab_size=4096, model_max_length=1000000000000000019884624838656, padding_side='right', truncation_side='right', special_tokens={'eos_token': '[EOS]', 'unk_token': '[UNK]'}, added_tokens_decoder={\n\t0: AddedToken(\"[UNK]\", rstrip=False, lstrip=False, single_word=False, normalized=False, special=True),\n\t1: AddedToken(\"[EOS]\", rstrip=False, lstrip=False, single_word=False, normalized=False, special=True),\n})", "ctx_len": 512, "vocab_size": 4096, "num_layers": 5, "num_heads": 8, "num_key_value": 2, "attn_bias": true, "eos_token_id": 1, "embed_dim": 256, "mlp_dim": 1024}, "train": {"lr": 0.0001, "bs": 64, "ctx_len": 512, "acc_steps": 1, "warmup_prc": 0.1, "decay_prc": 0.1, "epochs": 1, "adam_betas": [0.9, 0.95], "seed": 1, "num_tokens": 111086080}, "eval": {"run": true, "sample": false, "elicit": true, "num_train_evals": 200}, "name": "filter_5m", "res_dir": "/workspace/modular-pretraining/results/distill/seed_1/20261005064940764364/filter_5m", "retain_targets": [["core"]]}
+[GPU 0] [07:33:52] [INFO] FILTERING START
+[GPU 0] [07:33:52] [INFO] Using stage-level retain_targets override (1 targets)
+[GPU 0] [07:33:52] [INFO] Filtering: retaining ['core'], removing ['a-deadline-or-time-limit']
+[GPU 0] [07:33:52] [INFO] Initialized BaseTransformer with 5,554,304 total parameters
+[GPU 0] [07:33:52] [INFO] Compiling BaseTransformer with torch.compile...
+[GPU 0] [07:33:52] [INFO] ---- Begin Train | Train Labels: ['core'] ----
+[GPU 0] [07:33:52] [INFO] num_total_steps: 1695
+[GPU 0] [07:33:52] [INFO] warmup_steps: 170
+[GPU 0] [07:33:52] [INFO] constant_steps: 1355
+[GPU 0] [07:33:52] [INFO] decay_steps: 170
+[GPU 0] [07:33:52] [INFO] LR Scheduler: Warmup Start
+[GPU 0] [07:33:52] [INFO] Step: 1, LR: 5.98e-07
+[GPU 0] [07:33:52] [INFO] Train Loss: 8.38
+[GPU 0] [07:33:52] [INFO] Val Loss: CORE: nan A-DEADLINE-OR-TIME-LIMIT: nan 
+[GPU 0] [07:34:16] [INFO] LR Scheduler: Constant Start
+[GPU 0] [07:36:13] [INFO] Step: 1000, LR: 1.00e-04
+[GPU 0] [07:36:13] [INFO] Train Loss: 3.87
+[GPU 0] [07:36:13] [INFO] Val Loss: CORE: 3.87 A-DEADLINE-OR-TIME-LIMIT: 4.00 
+[GPU 0] [07:37:26] [INFO] LR Scheduler: Decay Start
+[GPU 0] [07:37:50] [INFO] Step: 1695, LR: 1.00e-08
+[GPU 0] [07:37:50] [INFO] Train Loss: 3.73
+[GPU 0] [07:37:50] [INFO] Val Loss: CORE: 3.73 A-DEADLINE-OR-TIME-LIMIT: 3.86 
+[GPU 0] [07:37:50] [INFO] ---- Begin Eval ----
+[GPU 0] [07:37:50] [INFO] Data: core | Experts: None
+[GPU 0] [07:38:00] [INFO] loss: 3.73049450
+[GPU 0] [07:38:00] [INFO] Data: a-deadline-or-time-limit | Experts: None
+[GPU 0] [07:38:01] [INFO] loss: 3.86249995
+[GPU 0] [07:38:01] [INFO] FILTERING - ADVERSARIAL FT START
+[GPU 0] [07:38:01] [INFO] Compiling BaseTransformer with torch.compile...
+[GPU 0] [07:38:01] [INFO] ---- Begin FT | Experts: None | Data: ['a-deadline-or-time-limit'] ----
+[GPU 0] [07:38:01] [DEBUG] num_seq: 512, num_rounds: 200, patience: 10
+[GPU 0] [07:38:01] [WARNING] Resampling ['a-deadline-or-time-limit'] (train) to fill the token budget: 22,705 -> 216,960 seqs (9.56x)
+[GPU 0] [07:38:01] [DEBUG] 4 micro-batches of 64 seqs per rank
+[GPU 0] [07:38:01] [INFO] New best validation loss: 3.8875 @ step 0
+[GPU 0] [07:38:01] [INFO] New best validation loss: 3.8617 @ step 1
+[GPU 0] [07:38:03] [INFO] New best validation loss: 3.8590 @ step 4
+[GPU 0] [07:38:03] [INFO] New best validation loss: 3.8559 @ step 5
+[GPU 0] [07:38:03] [INFO] New best validation loss: 3.8535 @ step 6
+[GPU 0] [07:38:04] [INFO] New best validation loss: 3.8531 @ step 7
+[GPU 0] [07:38:04] [INFO] New best validation loss: 3.8531 @ step 8
+[GPU 0] [07:38:04] [INFO] New best validation loss: 3.8531 @ step 9
+[GPU 0] [07:38:05] [INFO] New best validation loss: 3.8520 @ step 10
+[GPU 0] [07:38:05] [INFO] New best validation loss: 3.8508 @ step 11
+[GPU 0] [07:38:05] [INFO] New best validation loss: 3.8492 @ step 12
+[GPU 0] [07:38:06] [INFO] New best validation loss: 3.8484 @ step 13
+[GPU 0] [07:38:06] [INFO] New best validation loss: 3.8477 @ step 14
+[GPU 0] [07:38:06] [INFO] New best validation loss: 3.8473 @ step 15
+[GPU 0] [07:38:07] [INFO] New best validation loss: 3.8473 @ step 16
+[GPU 0] [07:38:07] [INFO] New best validation loss: 3.8469 @ step 17
+[GPU 0] [07:38:08] [INFO] New best validation loss: 3.8453 @ step 18
+[GPU 0] [07:38:08] [INFO] New best validation loss: 3.8441 @ step 19
+[GPU 0] [07:38:08] [INFO] New best validation loss: 3.8438 @ step 20
+[GPU 0] [07:38:09] [INFO] New best validation loss: 3.8430 @ step 21
+[GPU 0] [07:38:09] [INFO] New best validation loss: 3.8430 @ step 22
+[GPU 0] [07:38:09] [INFO] New best validation loss: 3.8426 @ step 23
+[GPU 0] [07:38:10] [INFO] New best validation loss: 3.8426 @ step 24
+[GPU 0] [07:38:10] [INFO] New best validation loss: 3.8422 @ step 25
+[GPU 0] [07:38:10] [INFO] New best validation loss: 3.8410 @ step 26
+[GPU 0] [07:38:11] [INFO] New best validation loss: 3.8406 @ step 27
+[GPU 0] [07:38:11] [INFO] New best validation loss: 3.8402 @ step 28
+[GPU 0] [07:38:11] [INFO] New best validation loss: 3.8398 @ step 29
+[GPU 0] [07:38:12] [INFO] New best validation loss: 3.8398 @ step 30
+[GPU 0] [07:38:12] [INFO] New best validation loss: 3.8398 @ step 31
+[GPU 0] [07:38:12] [INFO] New best validation loss: 3.8398 @ step 32
+[GPU 0] [07:38:13] [INFO] New best validation loss: 3.8391 @ step 33
+[GPU 0] [07:38:13] [INFO] New best validation loss: 3.8391 @ step 34
+[GPU 0] [07:38:14] [INFO] New best validation loss: 3.8391 @ step 35
+[GPU 0] [07:38:14] [INFO] New best validation loss: 3.8391 @ step 36
+[GPU 0] [07:38:14] [INFO] New best validation loss: 3.8383 @ step 37
+[GPU 0] [07:38:15] [INFO] New best validation loss: 3.8383 @ step 38
+[GPU 0] [07:38:15] [INFO] New best validation loss: 3.8375 @ step 39
+[GPU 0] [07:38:15] [INFO] New best validation loss: 3.8375 @ step 40
+[GPU 0] [07:38:16] [INFO] New best validation loss: 3.8371 @ step 41
+[GPU 0] [07:38:16] [INFO] New best validation loss: 3.8371 @ step 42
+[GPU 0] [07:38:16] [INFO] New best validation loss: 3.8363 @ step 43
+[GPU 0] [07:38:17] [INFO] New best validation loss: 3.8363 @ step 44
+[GPU 0] [07:38:17] [INFO] New best validation loss: 3.8355 @ step 45
+[GPU 0] [07:38:17] [INFO] New best validation loss: 3.8355 @ step 46
+[GPU 0] [07:38:18] [INFO] New best validation loss: 3.8355 @ step 47
+[GPU 0] [07:38:18] [INFO] New best validation loss: 3.8355 @ step 48
+[GPU 0] [07:38:19] [INFO] New best validation loss: 3.8352 @ step 49
+[GPU 0] [07:38:19] [INFO] New best validation loss: 3.8340 @ step 50
+[GPU 0] [07:38:19] [INFO] New best validation loss: 3.8340 @ step 51
+[GPU 0] [07:38:20] [INFO] New best validation loss: 3.8340 @ step 52
+[GPU 0] [07:38:20] [INFO] New best validation loss: 3.8340 @ step 53
+[GPU 0] [07:38:20] [INFO] New best validation loss: 3.8340 @ step 54
+[GPU 0] [07:38:21] [INFO] New best validation loss: 3.8336 @ step 55
+[GPU 0] [07:38:21] [INFO] New best validation loss: 3.8332 @ step 56
+[GPU 0] [07:38:21] [INFO] New best validation loss: 3.8328 @ step 57
+[GPU 0] [07:38:22] [INFO] New best validation loss: 3.8328 @ step 58
+[GPU 0] [07:38:22] [INFO] New best validation loss: 3.8324 @ step 59
+[GPU 0] [07:38:22] [INFO] New best validation loss: 3.8320 @ step 60
+[GPU 0] [07:38:23] [INFO] New best validation loss: 3.8320 @ step 61
+[GPU 0] [07:38:23] [INFO] New best validation loss: 3.8320 @ step 62
+[GPU 0] [07:38:24] [INFO] New best validation loss: 3.8320 @ step 63
+[GPU 0] [07:38:24] [INFO] New best validation loss: 3.8316 @ step 64
+[GPU 0] [07:38:24] [INFO] New best validation loss: 3.8305 @ step 65
+[GPU 0] [07:38:25] [INFO] New best validation loss: 3.8305 @ step 66
+[GPU 0] [07:38:25] [INFO] New best validation loss: 3.8301 @ step 67
+[GPU 0] [07:38:25] [INFO] New best validation loss: 3.8301 @ step 68
+[GPU 0] [07:38:26] [INFO] New best validation loss: 3.8301 @ step 69
+[GPU 0] [07:38:26] [INFO] New best validation loss: 3.8297 @ step 70
+[GPU 0] [07:38:26] [INFO] New best validation loss: 3.8293 @ step 71
+[GPU 0] [07:38:27] [INFO] New best validation loss: 3.8293 @ step 72
+[GPU 0] [07:38:27] [INFO] New best validation loss: 3.8289 @ step 73
+[GPU 0] [07:38:27] [INFO] New best validation loss: 3.8289 @ step 74
+[GPU 0] [07:38:28] [INFO] New best validation loss: 3.8285 @ step 75
+[GPU 0] [07:38:28] [INFO] New best validation loss: 3.8285 @ step 76
+[GPU 0] [07:38:28] [INFO] New best validation loss: 3.8285 @ step 77
+[GPU 0] [07:38:29] [INFO] New best validation loss: 3.8281 @ step 78
+[GPU 0] [07:38:29] [INFO] New best validation loss: 3.8281 @ step 79
+[GPU 0] [07:38:30] [INFO] New best validation loss: 3.8277 @ step 80
+[GPU 0] [07:38:30] [INFO] New best validation loss: 3.8273 @ step 81
+[GPU 0] [07:38:30] [INFO] New best validation loss: 3.8270 @ step 82
+[GPU 0] [07:38:31] [INFO] New best validation loss: 3.8270 @ step 83
+[GPU 0] [07:38:31] [INFO] New best validation loss: 3.8266 @ step 84
+[GPU 0] [07:38:31] [INFO] New best validation loss: 3.8266 @ step 85
+[GPU 0] [07:38:32] [INFO] New best validation loss: 3.8266 @ step 86
+[GPU 0] [07:38:32] [INFO] New best validation loss: 3.8266 @ step 87
+[GPU 0] [07:38:32] [INFO] New best validation loss: 3.8266 @ step 88
+[GPU 0] [07:38:33] [INFO] New best validation loss: 3.8266 @ step 89
+[GPU 0] [07:38:33] [INFO] New best validation loss: 3.8266 @ step 90
+[GPU 0] [07:38:33] [INFO] New best validation loss: 3.8262 @ step 91
+[GPU 0] [07:38:34] [INFO] New best validation loss: 3.8262 @ step 92
+[GPU 0] [07:38:34] [INFO] New best validation loss: 3.8258 @ step 93
+[GPU 0] [07:38:35] [INFO] New best validation loss: 3.8254 @ step 94
+[GPU 0] [07:38:35] [INFO] New best validation loss: 3.8250 @ step 95
+[GPU 0] [07:38:35] [INFO] New best validation loss: 3.8250 @ step 96
+[GPU 0] [07:38:36] [INFO] New best validation loss: 3.8250 @ step 97
+[GPU 0] [07:38:36] [INFO] New best validation loss: 3.8246 @ step 98
+[GPU 0] [07:38:36] [INFO] New best validation loss: 3.8242 @ step 99
+[GPU 0] [07:38:37] [INFO] New best validation loss: 3.8242 @ step 100
+[GPU 0] [07:38:37] [INFO] New best validation loss: 3.8242 @ step 101
+[GPU 0] [07:38:37] [INFO] New best validation loss: 3.8242 @ step 102
+[GPU 0] [07:38:38] [INFO] New best validation loss: 3.8242 @ step 103
+[GPU 0] [07:38:38] [INFO] New best validation loss: 3.8238 @ step 104
+[GPU 0] [07:38:38] [INFO] New best validation loss: 3.8238 @ step 105
+[GPU 0] [07:38:39] [INFO] New best validation loss: 3.8238 @ step 106
+[GPU 0] [07:38:39] [INFO] New best validation loss: 3.8238 @ step 107
+[GPU 0] [07:38:40] [INFO] New best validation loss: 3.8238 @ step 108
+[GPU 0] [07:38:40] [INFO] New best validation loss: 3.8238 @ step 109
+[GPU 0] [07:38:40] [INFO] New best validation loss: 3.8238 @ step 110
+[GPU 0] [07:38:41] [INFO] New best validation loss: 3.8238 @ step 111
+[GPU 0] [07:38:41] [INFO] New best validation loss: 3.8234 @ step 112
+[GPU 0] [07:38:41] [INFO] New best validation loss: 3.8230 @ step 113
+[GPU 0] [07:38:42] [INFO] New best validation loss: 3.8230 @ step 114
+[GPU 0] [07:38:42] [INFO] New best validation loss: 3.8230 @ step 115
+[GPU 0] [07:38:42] [INFO] New best validation loss: 3.8230 @ step 116
+[GPU 0] [07:38:43] [INFO] New best validation loss: 3.8230 @ step 117
+[GPU 0] [07:38:43] [INFO] New best validation loss: 3.8230 @ step 118
+[GPU 0] [07:38:43] [INFO] New best validation loss: 3.8230 @ step 119
+[GPU 0] [07:38:44] [INFO] New best validation loss: 3.8227 @ step 120
+[GPU 0] [07:38:44] [INFO] New best validation loss: 3.8227 @ step 121
+[GPU 0] [07:38:44] [INFO] New best validation loss: 3.8227 @ step 122
+[GPU 0] [07:38:45] [INFO] New best validation loss: 3.8223 @ step 123
+[GPU 0] [07:38:45] [INFO] New best validation loss: 3.8223 @ step 124
+[GPU 0] [07:38:46] [INFO] New best validation loss: 3.8219 @ step 125
+[GPU 0] [07:38:46] [INFO] New best validation loss: 3.8215 @ step 126
+[GPU 0] [07:38:46] [INFO] New best validation loss: 3.8215 @ step 127
+[GPU 0] [07:38:47] [INFO] New best validation loss: 3.8215 @ step 128
+[GPU 0] [07:38:47] [INFO] New best validation loss: 3.8215 @ step 129
+[GPU 0] [07:38:47] [INFO] New best validation loss: 3.8215 @ step 130
+[GPU 0] [07:38:48] [INFO] New best validation loss: 3.8215 @ step 131
+[GPU 0] [07:38:48] [INFO] New best validation loss: 3.8215 @ step 132
+[GPU 0] [07:38:48] [INFO] New best validation loss: 3.8215 @ step 133
+[GPU 0] [07:38:49] [INFO] New best validation loss: 3.8215 @ step 134
+[GPU 0] [07:38:49] [INFO] New best validation loss: 3.8215 @ step 135
+[GPU 0] [07:38:49] [INFO] New best validation loss: 3.8211 @ step 136
+[GPU 0] [07:38:50] [INFO] New best validation loss: 3.8211 @ step 137
+[GPU 0] [07:38:50] [INFO] New best validation loss: 3.8211 @ step 138
+[GPU 0] [07:38:51] [INFO] New best validation loss: 3.8203 @ step 139
+[GPU 0] [07:38:51] [INFO] New best validation loss: 3.8203 @ step 141
+[GPU 0] [07:38:52] [INFO] New best validation loss: 3.8203 @ step 142
+[GPU 0] [07:38:52] [INFO] New best validation loss: 3.8199 @ step 143
+[GPU 0] [07:38:52] [INFO] New best validation loss: 3.8199 @ step 144
+[GPU 0] [07:38:53] [INFO] New best validation loss: 3.8199 @ step 145
+[GPU 0] [07:38:53] [INFO] New best validation loss: 3.8199 @ step 146
+[GPU 0] [07:38:53] [INFO] New best validation loss: 3.8199 @ step 147
+[GPU 0] [07:38:54] [INFO] New best validation loss: 3.8199 @ step 148
+[GPU 0] [07:38:54] [INFO] New best validation loss: 3.8195 @ step 149
+[GPU 0] [07:38:55] [INFO] New best validation loss: 3.8195 @ step 151
+[GPU 0] [07:38:55] [INFO] New best validation loss: 3.8191 @ step 152
+[GPU 0] [07:38:55] [INFO] New best validation loss: 3.8191 @ step 153
+[GPU 0] [07:38:56] [INFO] New best validation loss: 3.8187 @ step 154
+[GPU 0] [07:38:56] [INFO] New best validation loss: 3.8184 @ step 155
+[GPU 0] [07:38:57] [INFO] New best validation loss: 3.8184 @ step 156
+[GPU 0] [07:38:57] [INFO] New best validation loss: 3.8184 @ step 157
+[GPU 0] [07:38:57] [INFO] New best validation loss: 3.8180 @ step 158
+[GPU 0] [07:38:58] [INFO] New best validation loss: 3.8180 @ step 159
+[GPU 0] [07:38:58] [INFO] New best validation loss: 3.8180 @ step 160
+[GPU 0] [07:38:58] [INFO] New best validation loss: 3.8180 @ step 161
+[GPU 0] [07:38:59] [INFO] New best validation loss: 3.8180 @ step 162
+[GPU 0] [07:38:59] [INFO] New best validation loss: 3.8180 @ step 163
+[GPU 0] [07:38:59] [INFO] New best validation loss: 3.8180 @ step 164
+[GPU 0] [07:39:00] [INFO] New best validation loss: 3.8180 @ step 165
+[GPU 0] [07:39:00] [INFO] New best validation loss: 3.8180 @ step 166
+[GPU 0] [07:39:00] [INFO] New best validation loss: 3.8180 @ step 167
+[GPU 0] [07:39:01] [INFO] New best validation loss: 3.8172 @ step 168
+[GPU 0] [07:39:01] [INFO] New best validation loss: 3.8172 @ step 169
+[GPU 0] [07:39:02] [INFO] New best validation loss: 3.8172 @ step 170
+[GPU 0] [07:39:02] [INFO] New best validation loss: 3.8168 @ step 171
+[GPU 0] [07:39:02] [INFO] New best validation loss: 3.8168 @ step 172
+[GPU 0] [07:39:03] [INFO] New best validation loss: 3.8168 @ step 173
+[GPU 0] [07:39:03] [INFO] New best validation loss: 3.8164 @ step 174
+[GPU 0] [07:39:03] [INFO] New best validation loss: 3.8164 @ step 175
+[GPU 0] [07:39:04] [INFO] New best validation loss: 3.8160 @ step 176
+[GPU 0] [07:39:04] [INFO] New best validation loss: 3.8160 @ step 177
+[GPU 0] [07:39:04] [INFO] New best validation loss: 3.8160 @ step 178
+[GPU 0] [07:39:05] [INFO] New best validation loss: 3.8156 @ step 179
+[GPU 0] [07:39:05] [INFO] New best validation loss: 3.8148 @ step 180
+[GPU 0] [07:39:05] [INFO] New best validation loss: 3.8148 @ step 181
+[GPU 0] [07:39:06] [INFO] New best validation loss: 3.8148 @ step 182
+[GPU 0] [07:39:06] [INFO] New best validation loss: 3.8148 @ step 183
+[GPU 0] [07:39:07] [INFO] New best validation loss: 3.8148 @ step 184
+[GPU 0] [07:39:07] [INFO] New best validation loss: 3.8148 @ step 185
+[GPU 0] [07:39:07] [INFO] New best validation loss: 3.8148 @ step 186
+[GPU 0] [07:39:08] [INFO] New best validation loss: 3.8145 @ step 187
+[GPU 0] [07:39:08] [INFO] New best validation loss: 3.8145 @ step 189
+[GPU 0] [07:39:09] [INFO] New best validation loss: 3.8145 @ step 190
+[GPU 0] [07:39:09] [INFO] New best validation loss: 3.8145 @ step 191
+[GPU 0] [07:39:09] [INFO] New best validation loss: 3.8145 @ step 192
+[GPU 0] [07:39:10] [INFO] New best validation loss: 3.8145 @ step 193
+[GPU 0] [07:39:10] [INFO] New best validation loss: 3.8145 @ step 194
+[GPU 0] [07:39:11] [INFO] New best validation loss: 3.8141 @ step 195
+[GPU 0] [07:39:11] [INFO] New best validation loss: 3.8141 @ step 196
+[GPU 0] [07:39:11] [INFO] New best validation loss: 3.8137 @ step 197
+[GPU 0] [07:39:12] [INFO] New best validation loss: 3.8133 @ step 198
+[GPU 0] [07:39:12] [INFO] New best validation loss: 3.8133 @ step 199
+[GPU 0] [07:39:12] [INFO] Wrote stats.jsonl entries at FT step 199 
+[GPU 0] [07:39:12] [INFO] Stage [distill_all_5m] start: {"model": {"arch": "base", "tokenizer": "TokenizersBackend(name_or_path='SimpleStories/SimpleStories-1.25M', vocab_size=4096, model_max_length=1000000000000000019884624838656, padding_side='right', truncation_side='right', special_tokens={'eos_token': '[EOS]', 'unk_token': '[UNK]'}, added_tokens_decoder={\n\t0: AddedToken(\"[UNK]\", rstrip=False, lstrip=False, single_word=False, normalized=False, special=True),\n\t1: AddedToken(\"[EOS]\", rstrip=False, lstrip=False, single_word=False, normalized=False, special=True),\n})", "ctx_len": 512, "vocab_size": 4096, "num_layers": 5, "num_heads": 8, "num_key_value": 2, "attn_bias": true, "eos_token_id": 1, "embed_dim": 256, "mlp_dim": 1024}, "train": {"lr": 0.0001, "bs": 64, "ctx_len": 512, "acc_steps": 1, "warmup_prc": 0.1, "decay_prc": 0.1, "epochs": 1, "adam_betas": [0.9, 0.95], "seed": 1, "num_tokens": 111086080}, "eval": {"run": true, "sample": false, "elicit": true, "num_train_evals": 200}, "name": "distill_all_5m", "res_dir": "/workspace/modular-pretraining/results/distill/seed_1/20261005064940764364/distill_all_5m", "retain_targets": [["core", "a-deadline-or-time-limit"]], "teacher": "base_20m", "teacher_type": "baseline", "specialist": {"lr": 0.0001, "bs": 128, "ctx_len": 512, "acc_steps": 1, "warmup_prc": 0.1, "decay_prc": 0.1, "epochs": 1, "adam_betas": [0.9, 0.95], "seed": 42, "num_tokens": -1}, "alpha": 1.0, "temperature": 1.0}
+[GPU 0] [07:39:12] [INFO] DISTILL START
+[GPU 0] [07:39:12] [INFO] Distill: retaining ['core', 'a-deadline-or-time-limit'], removing []
+[GPU 0] [07:39:12] [INFO] Initialized BaseTransformer with 5,554,304 total parameters
+[GPU 0] [07:39:12] [INFO] Compiling BaseTransformer with torch.compile...
+[GPU 0] [07:39:12] [INFO] ---- Begin Distill | Train Labels: ['core', 'a-deadline-or-time-limit'] | anti-teacher: False | alpha: 1.0 | T: 1.0 ----
+[GPU 0] [07:39:13] [INFO] num_total_steps: 1695
+[GPU 0] [07:39:13] [INFO] warmup_steps: 170
+[GPU 0] [07:39:13] [INFO] constant_steps: 1355
+[GPU 0] [07:39:13] [INFO] decay_steps: 170
+[GPU 0] [07:39:13] [INFO] LR Scheduler: Warmup Start
+[GPU 0] [07:39:24] [INFO] Step: 1, LR: 5.98e-07, Train KL: 4.998, Val CE: 
+[GPU 0] [07:39:54] [INFO] LR Scheduler: Constant Start
+[GPU 0] [07:42:22] [INFO] Step: 1000, LR: 1.00e-04, Train KL: 0.702, Val CE: CORE: 3.79 A-DEADLINE-OR-TIME-LIMIT: 3.90
+[GPU 0] [07:43:55] [INFO] LR Scheduler: Decay Start
+[GPU 0] [07:44:25] [INFO] Step: 1695, LR: 1.00e-08, Train KL: 0.596, Val CE: CORE: 3.67 A-DEADLINE-OR-TIME-LIMIT: 3.78
+[GPU 0] [07:44:25] [INFO] ---- Begin Eval ----
+[GPU 0] [07:44:25] [INFO] Data: core | Experts: None
+[GPU 0] [07:44:35] [INFO] loss: 3.67008138
+[GPU 0] [07:44:35] [INFO] Data: a-deadline-or-time-limit | Experts: None
+[GPU 0] [07:44:36] [INFO] loss: 3.78164053
+[GPU 0] [07:44:36] [INFO] Stage [distill_base_5m] start: {"model": {"arch": "base", "tokenizer": "TokenizersBackend(name_or_path='SimpleStories/SimpleStories-1.25M', vocab_size=4096, model_max_length=1000000000000000019884624838656, padding_side='right', truncation_side='right', special_tokens={'eos_token': '[EOS]', 'unk_token': '[UNK]'}, added_tokens_decoder={\n\t0: AddedToken(\"[UNK]\", rstrip=False, lstrip=False, single_word=False, normalized=False, special=True),\n\t1: AddedToken(\"[EOS]\", rstrip=False, lstrip=False, single_word=False, normalized=False, special=True),\n})", "ctx_len": 512, "vocab_size": 4096, "num_layers": 5, "num_heads": 8, "num_key_value": 2, "attn_bias": true, "eos_token_id": 1, "embed_dim": 256, "mlp_dim": 1024}, "train": {"lr": 0.0001, "bs": 64, "ctx_len": 512, "acc_steps": 1, "warmup_prc": 0.1, "decay_prc": 0.1, "epochs": 1, "adam_betas": [0.9, 0.95], "seed": 1, "num_tokens": 111086080}, "eval": {"run": true, "sample": false, "elicit": true, "num_train_evals": 200}, "name": "distill_base_5m", "res_dir": "/workspace/modular-pretraining/results/distill/seed_1/20261005064940764364/distill_base_5m", "retain_targets": [["core"]], "teacher": "base_20m", "teacher_type": "baseline", "specialist": {"lr": 0.0001, "bs": 128, "ctx_len": 512, "acc_steps": 1, "warmup_prc": 0.1, "decay_prc": 0.1, "epochs": 1, "adam_betas": [0.9, 0.95], "seed": 42, "num_tokens": -1}, "alpha": 1.0, "temperature": 1.0}
+[GPU 0] [07:44:36] [INFO] DISTILL START
+[GPU 0] [07:44:36] [INFO] Distill: retaining ['core'], removing ['a-deadline-or-time-limit']
+[GPU 0] [07:44:37] [INFO] Initialized BaseTransformer with 5,554,304 total parameters
+[GPU 0] [07:44:37] [INFO] Compiling BaseTransformer with torch.compile...
+[GPU 0] [07:44:37] [INFO] ---- Begin Distill | Train Labels: ['core'] | anti-teacher: False | alpha: 1.0 | T: 1.0 ----
+[GPU 0] [07:44:37] [INFO] num_total_steps: 1695
+[GPU 0] [07:44:37] [INFO] warmup_steps: 170
+[GPU 0] [07:44:37] [INFO] constant_steps: 1355
+[GPU 0] [07:44:37] [INFO] decay_steps: 170
+[GPU 0] [07:44:37] [INFO] LR Scheduler: Warmup Start
+[GPU 0] [07:44:37] [INFO] Step: 1, LR: 5.98e-07, Train KL: 4.995, Val CE: 
+[GPU 0] [07:45:07] [INFO] LR Scheduler: Constant Start
+[GPU 0] [07:47:34] [INFO] Step: 1000, LR: 1.00e-04, Train KL: 0.692, Val CE: CORE: 3.78 A-DEADLINE-OR-TIME-LIMIT: 3.90
+[GPU 0] [07:49:06] [INFO] LR Scheduler: Decay Start
+[GPU 0] [07:49:36] [INFO] Step: 1695, LR: 1.00e-08, Train KL: 0.594, Val CE: CORE: 3.67 A-DEADLINE-OR-TIME-LIMIT: 3.79
+[GPU 0] [07:49:36] [INFO] ---- Begin Eval ----
+[GPU 0] [07:49:36] [INFO] Data: core | Experts: None
+[GPU 0] [07:49:47] [INFO] loss: 3.66609764
+[GPU 0] [07:49:47] [INFO] Data: a-deadline-or-time-limit | Experts: None
+[GPU 0] [07:49:47] [INFO] loss: 3.78945303
+[GPU 0] [07:49:47] [INFO] DISTILL - ADVERSARIAL FT START
+[GPU 0] [07:49:47] [INFO] Compiling BaseTransformer with torch.compile...
+[GPU 0] [07:49:47] [INFO] ---- Begin FT | Experts: None | Data: ['a-deadline-or-time-limit'] ----
+[GPU 0] [07:49:47] [DEBUG] num_seq: 512, num_rounds: 200, patience: 10
+[GPU 0] [07:49:47] [WARNING] Resampling ['a-deadline-or-time-limit'] (train) to fill the token budget: 22,705 -> 216,960 seqs (9.56x)
+[GPU 0] [07:49:47] [DEBUG] 4 micro-batches of 64 seqs per rank
+[GPU 0] [07:49:48] [INFO] New best validation loss: 3.8168 @ step 0
+[GPU 0] [07:49:48] [INFO] New best validation loss: 3.7922 @ step 1
+[GPU 0] [07:49:48] [INFO] New best validation loss: 3.7910 @ step 2
+[GPU 0] [07:49:49] [INFO] New best validation loss: 3.7898 @ step 3
+[GPU 0] [07:49:49] [INFO] New best validation loss: 3.7883 @ step 4
+[GPU 0] [07:49:49] [INFO] New best validation loss: 3.7844 @ step 5
+[GPU 0] [07:49:50] [INFO] New best validation loss: 3.7816 @ step 6
+[GPU 0] [07:49:50] [INFO] New best validation loss: 3.7805 @ step 7
+[GPU 0] [07:49:51] [INFO] New best validation loss: 3.7805 @ step 8
+[GPU 0] [07:49:51] [INFO] New best validation loss: 3.7801 @ step 9
+[GPU 0] [07:49:51] [INFO] New best validation loss: 3.7797 @ step 10
+[GPU 0] [07:49:52] [INFO] New best validation loss: 3.7785 @ step 11
+[GPU 0] [07:49:52] [INFO] New best validation loss: 3.7770 @ step 12
+[GPU 0] [07:49:52] [INFO] New best validation loss: 3.7766 @ step 13
+[GPU 0] [07:49:53] [INFO] New best validation loss: 3.7750 @ step 14
+[GPU 0] [07:49:53] [INFO] New best validation loss: 3.7746 @ step 15
+[GPU 0] [07:49:53] [INFO] New best validation loss: 3.7746 @ step 16
+[GPU 0] [07:49:54] [INFO] New best validation loss: 3.7746 @ step 17
+[GPU 0] [07:49:54] [INFO] New best validation loss: 3.7738 @ step 18
+[GPU 0] [07:49:54] [INFO] New best validation loss: 3.7734 @ step 19
+[GPU 0] [07:49:55] [INFO] New best validation loss: 3.7727 @ step 20
+[GPU 0] [07:49:55] [INFO] New best validation loss: 3.7727 @ step 21
+[GPU 0] [07:49:56] [INFO] New best validation loss: 3.7727 @ step 22
+[GPU 0] [07:49:56] [INFO] New best validation loss: 3.7711 @ step 23
+[GPU 0] [07:49:56] [INFO] New best validation loss: 3.7707 @ step 24
+[GPU 0] [07:49:57] [INFO] New best validation loss: 3.7703 @ step 25
+[GPU 0] [07:49:57] [INFO] New best validation loss: 3.7699 @ step 26
+[GPU 0] [07:49:57] [INFO] New best validation loss: 3.7699 @ step 27
+[GPU 0] [07:49:58] [INFO] New best validation loss: 3.7699 @ step 28
+[GPU 0] [07:49:58] [INFO] New best validation loss: 3.7695 @ step 29
+[GPU 0] [07:49:58] [INFO] New best validation loss: 3.7687 @ step 30
+[GPU 0] [07:49:59] [INFO] New best validation loss: 3.7684 @ step 31
+[GPU 0] [07:49:59] [INFO] New best validation loss: 3.7680 @ step 32
+[GPU 0] [07:49:59] [INFO] New best validation loss: 3.7680 @ step 33
+[GPU 0] [07:50:00] [INFO] New best validation loss: 3.7680 @ step 34
+[GPU 0] [07:50:00] [INFO] New best validation loss: 3.7668 @ step 35
+[GPU 0] [07:50:00] [INFO] New best validation loss: 3.7660 @ step 36
+[GPU 0] [07:50:01] [INFO] New best validation loss: 3.7660 @ step 37
+[GPU 0] [07:50:01] [INFO] New best validation loss: 3.7660 @ step 38
+[GPU 0] [07:50:02] [INFO] New best validation loss: 3.7660 @ step 39
+[GPU 0] [07:50:02] [INFO] New best validation loss: 3.7660 @ step 40
+[GPU 0] [07:50:02] [INFO] New best validation loss: 3.7656 @ step 41
+[GPU 0] [07:50:03] [INFO] New best validation loss: 3.7648 @ step 42
+[GPU 0] [07:50:03] [INFO] New best validation loss: 3.7645 @ step 43
+[GPU 0] [07:50:03] [INFO] New best validation loss: 3.7645 @ step 44
+[GPU 0] [07:50:04] [INFO] New best validation loss: 3.7641 @ step 45
+[GPU 0] [07:50:04] [INFO] New best validation loss: 3.7637 @ step 46
+[GPU 0] [07:50:04] [INFO] New best validation loss: 3.7629 @ step 47
+[GPU 0] [07:50:05] [INFO] New best validation loss: 3.7629 @ step 48
+[GPU 0] [07:50:05] [INFO] New best validation loss: 3.7629 @ step 49
+[GPU 0] [07:50:05] [INFO] New best validation loss: 3.7629 @ step 50
+[GPU 0] [07:50:06] [INFO] New best validation loss: 3.7629 @ step 51
+[GPU 0] [07:50:06] [INFO] New best validation loss: 3.7629 @ step 52
+[GPU 0] [07:50:07] [INFO] New best validation loss: 3.7629 @ step 53
+[GPU 0] [07:50:07] [INFO] New best validation loss: 3.7625 @ step 54
+[GPU 0] [07:50:07] [INFO] New best validation loss: 3.7625 @ step 55
+[GPU 0] [07:50:08] [INFO] New best validation loss: 3.7621 @ step 56
+[GPU 0] [07:50:08] [INFO] New best validation loss: 3.7617 @ step 57
+[GPU 0] [07:50:08] [INFO] New best validation loss: 3.7613 @ step 58
+[GPU 0] [07:50:09] [INFO] New best validation loss: 3.7609 @ step 59
+[GPU 0] [07:50:09] [INFO] New best validation loss: 3.7605 @ step 60
+[GPU 0] [07:50:09] [INFO] New best validation loss: 3.7598 @ step 61
+[GPU 0] [07:50:10] [INFO] New best validation loss: 3.7598 @ step 62
+[GPU 0] [07:50:10] [INFO] New best validation loss: 3.7594 @ step 63
+[GPU 0] [07:50:10] [INFO] New best validation loss: 3.7590 @ step 64
+[GPU 0] [07:50:11] [INFO] New best validation loss: 3.7590 @ step 65
+[GPU 0] [07:50:11] [INFO] New best validation loss: 3.7590 @ step 66
+[GPU 0] [07:50:12] [INFO] New best validation loss: 3.7590 @ step 67
+[GPU 0] [07:50:12] [INFO] New best validation loss: 3.7590 @ step 68
+[GPU 0] [07:50:12] [INFO] New best validation loss: 3.7590 @ step 69
+[GPU 0] [07:50:13] [INFO] New best validation loss: 3.7590 @ step 70
+[GPU 0] [07:50:13] [INFO] New best validation loss: 3.7590 @ step 71
+[GPU 0] [07:50:13] [INFO] New best validation loss: 3.7590 @ step 72
+[GPU 0] [07:50:14] [INFO] New best validation loss: 3.7586 @ step 73
+[GPU 0] [07:50:14] [INFO] New best validation loss: 3.7586 @ step 74
+[GPU 0] [07:50:14] [INFO] New best validation loss: 3.7586 @ step 75
+[GPU 0] [07:50:15] [INFO] New best validation loss: 3.7582 @ step 76
+[GPU 0] [07:50:15] [INFO] New best validation loss: 3.7582 @ step 77
+[GPU 0] [07:50:15] [INFO] New best validation loss: 3.7578 @ step 78
+[GPU 0] [07:50:16] [INFO] New best validation loss: 3.7570 @ step 79
+[GPU 0] [07:50:16] [INFO] New best validation loss: 3.7570 @ step 80
+[GPU 0] [07:50:16] [INFO] New best validation loss: 3.7570 @ step 81
+[GPU 0] [07:50:17] [INFO] New best validation loss: 3.7570 @ step 82
+[GPU 0] [07:50:17] [INFO] New best validation loss: 3.7570 @ step 83
+[GPU 0] [07:50:18] [INFO] New best validation loss: 3.7570 @ step 84
+[GPU 0] [07:50:18] [INFO] New best validation loss: 3.7570 @ step 85
+[GPU 0] [07:50:18] [INFO] New best validation loss: 3.7570 @ step 86
+[GPU 0] [07:50:19] [INFO] New best validation loss: 3.7570 @ step 87
+[GPU 0] [07:50:19] [INFO] New best validation loss: 3.7566 @ step 88
+[GPU 0] [07:50:19] [INFO] New best validation loss: 3.7566 @ step 89
+[GPU 0] [07:50:20] [INFO] New best validation loss: 3.7562 @ step 90
+[GPU 0] [07:50:20] [INFO] New best validation loss: 3.7562 @ step 91
+[GPU 0] [07:50:20] [INFO] New best validation loss: 3.7562 @ step 92
+[GPU 0] [07:50:21] [INFO] New best validation loss: 3.7562 @ step 93
+[GPU 0] [07:50:21] [INFO] New best validation loss: 3.7562 @ step 94
+[GPU 0] [07:50:21] [INFO] New best validation loss: 3.7559 @ step 95
+[GPU 0] [07:50:22] [INFO] New best validation loss: 3.7555 @ step 96
+[GPU 0] [07:50:22] [INFO] New best validation loss: 3.7551 @ step 97
+[GPU 0] [07:50:23] [INFO] New best validation loss: 3.7551 @ step 99
+[GPU 0] [07:50:23] [INFO] New best validation loss: 3.7547 @ step 100
+[GPU 0] [07:50:24] [INFO] New best validation loss: 3.7547 @ step 101
+[GPU 0] [07:50:24] [INFO] New best validation loss: 3.7543 @ step 102
+[GPU 0] [07:50:24] [INFO] New best validation loss: 3.7543 @ step 103
+[GPU 0] [07:50:25] [INFO] New best validation loss: 3.7539 @ step 104
+[GPU 0] [07:50:25] [INFO] New best validation loss: 3.7539 @ step 105
+[GPU 0] [07:50:25] [INFO] New best validation loss: 3.7539 @ step 106
+[GPU 0] [07:50:26] [INFO] New best validation loss: 3.7535 @ step 107
+[GPU 0] [07:50:26] [INFO] New best validation loss: 3.7535 @ step 108
+[GPU 0] [07:50:27] [INFO] New best validation loss: 3.7531 @ step 109
+[GPU 0] [07:50:27] [INFO] New best validation loss: 3.7531 @ step 110
+[GPU 0] [07:50:27] [INFO] New best validation loss: 3.7527 @ step 111
+[GPU 0] [07:50:28] [INFO] New best validation loss: 3.7527 @ step 112
+[GPU 0] [07:50:28] [INFO] New best validation loss: 3.7527 @ step 113
+[GPU 0] [07:50:28] [INFO] New best validation loss: 3.7523 @ step 114
+[GPU 0] [07:50:29] [INFO] New best validation loss: 3.7523 @ step 115
+[GPU 0] [07:50:29] [INFO] New best validation loss: 3.7523 @ step 116
+[GPU 0] [07:50:29] [INFO] New best validation loss: 3.7523 @ step 117
+[GPU 0] [07:50:30] [INFO] New best validation loss: 3.7523 @ step 118
+[GPU 0] [07:50:30] [INFO] New best validation loss: 3.7523 @ step 119
+[GPU 0] [07:50:31] [INFO] New best validation loss: 3.7520 @ step 120
+[GPU 0] [07:50:31] [INFO] New best validation loss: 3.7520 @ step 121
+[GPU 0] [07:50:31] [INFO] New best validation loss: 3.7520 @ step 122
+[GPU 0] [07:50:32] [INFO] New best validation loss: 3.7520 @ step 123
+[GPU 0] [07:50:32] [INFO] New best validation loss: 3.7516 @ step 124
+[GPU 0] [07:50:32] [INFO] New best validation loss: 3.7516 @ step 125
+[GPU 0] [07:50:33] [INFO] New best validation loss: 3.7516 @ step 126
+[GPU 0] [07:50:33] [INFO] New best validation loss: 3.7512 @ step 127
+[GPU 0] [07:50:33] [INFO] New best validation loss: 3.7508 @ step 128
+[GPU 0] [07:50:34] [INFO] New best validation loss: 3.7508 @ step 129
+[GPU 0] [07:50:34] [INFO] New best validation loss: 3.7508 @ step 130
+[GPU 0] [07:50:35] [INFO] New best validation loss: 3.7508 @ step 131
+[GPU 0] [07:50:35] [INFO] New best validation loss: 3.7504 @ step 132
+[GPU 0] [07:50:35] [INFO] New best validation loss: 3.7504 @ step 133
+[GPU 0] [07:50:36] [INFO] New best validation loss: 3.7504 @ step 134
+[GPU 0] [07:50:36] [INFO] New best validation loss: 3.7504 @ step 135
+[GPU 0] [07:50:36] [INFO] New best validation loss: 3.7504 @ step 136
+[GPU 0] [07:50:37] [INFO] New best validation loss: 3.7504 @ step 137
+[GPU 0] [07:50:37] [INFO] New best validation loss: 3.7504 @ step 138
+[GPU 0] [07:50:37] [INFO] New best validation loss: 3.7504 @ step 139
+[GPU 0] [07:50:38] [INFO] New best validation loss: 3.7500 @ step 140
+[GPU 0] [07:50:38] [INFO] New best validation loss: 3.7500 @ step 141
+[GPU 0] [07:50:38] [INFO] New best validation loss: 3.7500 @ step 142
+[GPU 0] [07:50:39] [INFO] New best validation loss: 3.7500 @ step 143
+[GPU 0] [07:50:39] [INFO] New best validation loss: 3.7496 @ step 144
+[GPU 0] [07:50:40] [INFO] New best validation loss: 3.7496 @ step 145
+[GPU 0] [07:50:40] [INFO] New best validation loss: 3.7496 @ step 146
+[GPU 0] [07:50:40] [INFO] New best validation loss: 3.7496 @ step 147
+[GPU 0] [07:50:41] [INFO] New best validation loss: 3.7496 @ step 148
+[GPU 0] [07:50:41] [INFO] New best validation loss: 3.7496 @ step 149
+[GPU 0] [07:50:41] [INFO] New best validation loss: 3.7496 @ step 150
+[GPU 0] [07:50:42] [INFO] New best validation loss: 3.7496 @ step 151
+[GPU 0] [07:50:42] [INFO] New best validation loss: 3.7496 @ step 152
+[GPU 0] [07:50:42] [INFO] New best validation loss: 3.7496 @ step 153
+[GPU 0] [07:50:43] [INFO] New best validation loss: 3.7496 @ step 154
+[GPU 0] [07:50:43] [INFO] New best validation loss: 3.7496 @ step 155
+[GPU 0] [07:50:43] [INFO] New best validation loss: 3.7492 @ step 156
+[GPU 0] [07:50:44] [INFO] New best validation loss: 3.7492 @ step 157
+[GPU 0] [07:50:44] [INFO] New best validation loss: 3.7492 @ step 158
+[GPU 0] [07:50:45] [INFO] New best validation loss: 3.7492 @ step 159
+[GPU 0] [07:50:45] [INFO] New best validation loss: 3.7492 @ step 160
+[GPU 0] [07:50:45] [INFO] New best validation loss: 3.7488 @ step 161
+[GPU 0] [07:50:46] [INFO] New best validation loss: 3.7488 @ step 162
+[GPU 0] [07:50:46] [INFO] New best validation loss: 3.7488 @ step 163
+[GPU 0] [07:50:46] [INFO] New best validation loss: 3.7488 @ step 164
+[GPU 0] [07:50:47] [INFO] New best validation loss: 3.7488 @ step 165
+[GPU 0] [07:50:47] [INFO] New best validation loss: 3.7488 @ step 166
+[GPU 0] [07:50:47] [INFO] New best validation loss: 3.7488 @ step 167
+[GPU 0] [07:50:48] [INFO] New best validation loss: 3.7488 @ step 168
+[GPU 0] [07:50:48] [INFO] New best validation loss: 3.7484 @ step 169
+[GPU 0] [07:50:49] [INFO] New best validation loss: 3.7484 @ step 170
+[GPU 0] [07:50:49] [INFO] New best validation loss: 3.7480 @ step 171
+[GPU 0] [07:50:49] [INFO] New best validation loss: 3.7480 @ step 172
+[GPU 0] [07:50:50] [INFO] New best validation loss: 3.7477 @ step 173
+[GPU 0] [07:50:50] [INFO] New best validation loss: 3.7477 @ step 174
+[GPU 0] [07:50:50] [INFO] New best validation loss: 3.7477 @ step 175
+[GPU 0] [07:50:51] [INFO] New best validation loss: 3.7477 @ step 176
+[GPU 0] [07:50:51] [INFO] New best validation loss: 3.7477 @ step 177
+[GPU 0] [07:50:51] [INFO] New best validation loss: 3.7473 @ step 178
+[GPU 0] [07:50:52] [INFO] New best validation loss: 3.7473 @ step 179
+[GPU 0] [07:50:52] [INFO] New best validation loss: 3.7469 @ step 180
+[GPU 0] [07:50:52] [INFO] New best validation loss: 3.7461 @ step 181
+[GPU 0] [07:50:53] [INFO] New best validation loss: 3.7461 @ step 183
+[GPU 0] [07:50:54] [INFO] New best validation loss: 3.7461 @ step 184
+[GPU 0] [07:50:54] [INFO] New best validation loss: 3.7461 @ step 185
+[GPU 0] [07:50:54] [INFO] New best validation loss: 3.7461 @ step 186
+[GPU 0] [07:50:55] [INFO] New best validation loss: 3.7461 @ step 187
+[GPU 0] [07:50:55] [INFO] New best validation loss: 3.7457 @ step 188
+[GPU 0] [07:50:55] [INFO] New best validation loss: 3.7457 @ step 189
+[GPU 0] [07:50:56] [INFO] New best validation loss: 3.7457 @ step 190
+[GPU 0] [07:50:56] [INFO] New best validation loss: 3.7457 @ step 191
+[GPU 0] [07:50:56] [INFO] New best validation loss: 3.7457 @ step 192
+[GPU 0] [07:50:57] [INFO] New best validation loss: 3.7457 @ step 193
+[GPU 0] [07:50:57] [INFO] New best validation loss: 3.7453 @ step 194
+[GPU 0] [07:50:57] [INFO] New best validation loss: 3.7453 @ step 195
+[GPU 0] [07:50:58] [INFO] New best validation loss: 3.7449 @ step 196
+[GPU 0] [07:50:59] [INFO] New best validation loss: 3.7445 @ step 198
+[GPU 0] [07:50:59] [INFO] New best validation loss: 3.7445 @ step 199
+[GPU 0] [07:50:59] [INFO] Wrote stats.jsonl entries at FT step 199 
+[GPU 0] [07:50:59] [INFO] Stage [distill_filter_5m] start: {"model": {"arch": "base", "tokenizer": "TokenizersBackend(name_or_path='SimpleStories/SimpleStories-1.25M', vocab_size=4096, model_max_length=1000000000000000019884624838656, padding_side='right', truncation_side='right', special_tokens={'eos_token': '[EOS]', 'unk_token': '[UNK]'}, added_tokens_decoder={\n\t0: AddedToken(\"[UNK]\", rstrip=False, lstrip=False, single_word=False, normalized=False, special=True),\n\t1: AddedToken(\"[EOS]\", rstrip=False, lstrip=False, single_word=False, normalized=False, special=True),\n})", "ctx_len": 512, "vocab_size": 4096, "num_layers": 5, "num_heads": 8, "num_key_value": 2, "attn_bias": true, "eos_token_id": 1, "embed_dim": 256, "mlp_dim": 1024}, "train": {"lr": 0.0001, "bs": 64, "ctx_len": 512, "acc_steps": 1, "warmup_prc": 0.1, "decay_prc": 0.1, "epochs": 1, "adam_betas": [0.9, 0.95], "seed": 1, "num_tokens": 111086080}, "eval": {"run": true, "sample": false, "elicit": true, "num_train_evals": 200}, "name": "distill_filter_5m", "res_dir": "/workspace/modular-pretraining/results/distill/seed_1/20261005064940764364/distill_filter_5m", "retain_targets": [["core"]], "teacher": "filter_20m", "teacher_type": "filtering", "specialist": {"lr": 0.0001, "bs": 128, "ctx_len": 512, "acc_steps": 1, "warmup_prc": 0.1, "decay_prc": 0.1, "epochs": 1, "adam_betas": [0.9, 0.95], "seed": 42, "num_tokens": -1}, "alpha": 1.0, "temperature": 1.0}
+[GPU 0] [07:50:59] [INFO] DISTILL START
+[GPU 0] [07:50:59] [INFO] Distill: retaining ['core'], removing ['a-deadline-or-time-limit']
+[GPU 0] [07:51:00] [INFO] Initialized BaseTransformer with 5,554,304 total parameters
+[GPU 0] [07:51:00] [INFO] Compiling BaseTransformer with torch.compile...
+[GPU 0] [07:51:00] [INFO] ---- Begin Distill | Train Labels: ['core'] | anti-teacher: False | alpha: 1.0 | T: 1.0 ----
+[GPU 0] [07:51:00] [INFO] num_total_steps: 1695
+[GPU 0] [07:51:00] [INFO] warmup_steps: 170
+[GPU 0] [07:51:00] [INFO] constant_steps: 1355
+[GPU 0] [07:51:00] [INFO] decay_steps: 170
+[GPU 0] [07:51:00] [INFO] LR Scheduler: Warmup Start
+[GPU 0] [07:51:00] [INFO] Step: 1, LR: 5.98e-07, Train KL: 5.008, Val CE: 
+[GPU 0] [07:51:30] [INFO] LR Scheduler: Constant Start
+[GPU 0] [07:53:58] [INFO] Step: 1000, LR: 1.00e-04, Train KL: 0.699, Val CE: CORE: 3.79 A-DEADLINE-OR-TIME-LIMIT: 3.92
+[GPU 0] [07:55:31] [INFO] LR Scheduler: Decay Start
+[GPU 0] [07:56:01] [INFO] Step: 1695, LR: 1.00e-08, Train KL: 0.597, Val CE: CORE: 3.67 A-DEADLINE-OR-TIME-LIMIT: 3.81
+[GPU 0] [07:56:01] [INFO] ---- Begin Eval ----
+[GPU 0] [07:56:01] [INFO] Data: core | Experts: None
+[GPU 0] [07:56:11] [INFO] loss: 3.66818428
+[GPU 0] [07:56:11] [INFO] Data: a-deadline-or-time-limit | Experts: None
+[GPU 0] [07:56:12] [INFO] loss: 3.80625010
+[GPU 0] [07:56:12] [INFO] DISTILL - ADVERSARIAL FT START
+[GPU 0] [07:56:12] [INFO] Compiling BaseTransformer with torch.compile...
+[GPU 0] [07:56:12] [INFO] ---- Begin FT | Experts: None | Data: ['a-deadline-or-time-limit'] ----
+[GPU 0] [07:56:12] [DEBUG] num_seq: 512, num_rounds: 200, patience: 10
+[GPU 0] [07:56:12] [WARNING] Resampling ['a-deadline-or-time-limit'] (train) to fill the token budget: 22,705 -> 216,960 seqs (9.56x)
+[GPU 0] [07:56:12] [DEBUG] 4 micro-batches of 64 seqs per rank
+[GPU 0] [07:56:13] [INFO] New best validation loss: 3.8309 @ step 0
+[GPU 0] [07:56:13] [INFO] New best validation loss: 3.8137 @ step 1
+[GPU 0] [07:56:13] [INFO] New best validation loss: 3.8082 @ step 2
+[GPU 0] [07:56:14] [INFO] New best validation loss: 3.8051 @ step 3
+[GPU 0] [07:56:14] [INFO] New best validation loss: 3.8023 @ step 4
+[GPU 0] [07:56:14] [INFO] New best validation loss: 3.8004 @ step 5
+[GPU 0] [07:56:15] [INFO] New best validation loss: 3.7984 @ step 6
+[GPU 0] [07:56:15] [INFO] New best validation loss: 3.7977 @ step 7
+[GPU 0] [07:56:16] [INFO] New best validation loss: 3.7973 @ step 8
+[GPU 0] [07:56:16] [INFO] New best validation loss: 3.7961 @ step 9
+[GPU 0] [07:56:16] [INFO] New best validation loss: 3.7953 @ step 10
+[GPU 0] [07:56:17] [INFO] New best validation loss: 3.7949 @ step 11
+[GPU 0] [07:56:17] [INFO] New best validation loss: 3.7941 @ step 12
+[GPU 0] [07:56:17] [INFO] New best validation loss: 3.7941 @ step 13
+[GPU 0] [07:56:18] [INFO] New best validation loss: 3.7934 @ step 14
+[GPU 0] [07:56:18] [INFO] New best validation loss: 3.7918 @ step 15
+[GPU 0] [07:56:18] [INFO] New best validation loss: 3.7910 @ step 16
+[GPU 0] [07:56:19] [INFO] New best validation loss: 3.7902 @ step 17
+[GPU 0] [07:56:19] [INFO] New best validation loss: 3.7898 @ step 18
+[GPU 0] [07:56:19] [INFO] New best validation loss: 3.7891 @ step 19
+[GPU 0] [07:56:20] [INFO] New best validation loss: 3.7887 @ step 20
+[GPU 0] [07:56:20] [INFO] New best validation loss: 3.7887 @ step 21
+[GPU 0] [07:56:21] [INFO] New best validation loss: 3.7875 @ step 22
+[GPU 0] [07:56:21] [INFO] New best validation loss: 3.7871 @ step 23
+[GPU 0] [07:56:21] [INFO] New best validation loss: 3.7863 @ step 24
+[GPU 0] [07:56:22] [INFO] New best validation loss: 3.7859 @ step 25
+[GPU 0] [07:56:22] [INFO] New best validation loss: 3.7855 @ step 26
+[GPU 0] [07:56:22] [INFO] New best validation loss: 3.7848 @ step 27
+[GPU 0] [07:56:23] [INFO] New best validation loss: 3.7848 @ step 28
+[GPU 0] [07:56:23] [INFO] New best validation loss: 3.7844 @ step 29
+[GPU 0] [07:56:23] [INFO] New best validation loss: 3.7844 @ step 30
+[GPU 0] [07:56:24] [INFO] New best validation loss: 3.7840 @ step 31
+[GPU 0] [07:56:24] [INFO] New best validation loss: 3.7840 @ step 32
+[GPU 0] [07:56:24] [INFO] New best validation loss: 3.7832 @ step 33
+[GPU 0] [07:56:25] [INFO] New best validation loss: 3.7832 @ step 34
+[GPU 0] [07:56:25] [INFO] New best validation loss: 3.7828 @ step 35
+[GPU 0] [07:56:26] [INFO] New best validation loss: 3.7820 @ step 36
+[GPU 0] [07:56:26] [INFO] New best validation loss: 3.7816 @ step 37
+[GPU 0] [07:56:26] [INFO] New best validation loss: 3.7816 @ step 38
+[GPU 0] [07:56:27] [INFO] New best validation loss: 3.7816 @ step 39
+[GPU 0] [07:56:27] [INFO] New best validation loss: 3.7816 @ step 40
+[GPU 0] [07:56:27] [INFO] New best validation loss: 3.7809 @ step 41
+[GPU 0] [07:56:28] [INFO] New best validation loss: 3.7805 @ step 42
+[GPU 0] [07:56:28] [INFO] New best validation loss: 3.7801 @ step 43
+[GPU 0] [07:56:28] [INFO] New best validation loss: 3.7801 @ step 44
+[GPU 0] [07:56:29] [INFO] New best validation loss: 3.7801 @ step 45
+[GPU 0] [07:56:29] [INFO] New best validation loss: 3.7789 @ step 46
+[GPU 0] [07:56:30] [INFO] New best validation loss: 3.7785 @ step 47
+[GPU 0] [07:56:30] [INFO] New best validation loss: 3.7785 @ step 48
+[GPU 0] [07:56:30] [INFO] New best validation loss: 3.7785 @ step 49
+[GPU 0] [07:56:31] [INFO] New best validation loss: 3.7785 @ step 50
+[GPU 0] [07:56:31] [INFO] New best validation loss: 3.7781 @ step 51
+[GPU 0] [07:56:31] [INFO] New best validation loss: 3.7781 @ step 52
+[GPU 0] [07:56:32] [INFO] New best validation loss: 3.7781 @ step 53
+[GPU 0] [07:56:32] [INFO] New best validation loss: 3.7781 @ step 54
+[GPU 0] [07:56:32] [INFO] New best validation loss: 3.7773 @ step 55
+[GPU 0] [07:56:33] [INFO] New best validation loss: 3.7762 @ step 56
+[GPU 0] [07:56:33] [INFO] New best validation loss: 3.7758 @ step 57
+[GPU 0] [07:56:33] [INFO] New best validation loss: 3.7754 @ step 58
+[GPU 0] [07:56:34] [INFO] New best validation loss: 3.7754 @ step 59
+[GPU 0] [07:56:34] [INFO] New best validation loss: 3.7754 @ step 60
+[GPU 0] [07:56:35] [INFO] New best validation loss: 3.7746 @ step 61
+[GPU 0] [07:56:35] [INFO] New best validation loss: 3.7746 @ step 62
+[GPU 0] [07:56:35] [INFO] New best validation loss: 3.7746 @ step 63
+[GPU 0] [07:56:36] [INFO] New best validation loss: 3.7746 @ step 64
+[GPU 0] [07:56:36] [INFO] New best validation loss: 3.7746 @ step 65
+[GPU 0] [07:56:36] [INFO] New best validation loss: 3.7742 @ step 66
+[GPU 0] [07:56:37] [INFO] New best validation loss: 3.7742 @ step 67
+[GPU 0] [07:56:37] [INFO] New best validation loss: 3.7738 @ step 68
+[GPU 0] [07:56:37] [INFO] New best validation loss: 3.7738 @ step 69
+[GPU 0] [07:56:38] [INFO] New best validation loss: 3.7738 @ step 70
+[GPU 0] [07:56:38] [INFO] New best validation loss: 3.7738 @ step 71
+[GPU 0] [07:56:39] [INFO] New best validation loss: 3.7738 @ step 72
+[GPU 0] [07:56:39] [INFO] New best validation loss: 3.7734 @ step 73
+[GPU 0] [07:56:39] [INFO] New best validation loss: 3.7734 @ step 74
+[GPU 0] [07:56:40] [INFO] New best validation loss: 3.7734 @ step 75
+[GPU 0] [07:56:40] [INFO] New best validation loss: 3.7734 @ step 76
+[GPU 0] [07:56:40] [INFO] New best validation loss: 3.7734 @ step 77
+[GPU 0] [07:56:41] [INFO] New best validation loss: 3.7730 @ step 78
+[GPU 0] [07:56:41] [INFO] New best validation loss: 3.7727 @ step 79
+[GPU 0] [07:56:41] [INFO] New best validation loss: 3.7723 @ step 80
+[GPU 0] [07:56:42] [INFO] New best validation loss: 3.7723 @ step 81
+[GPU 0] [07:56:42] [INFO] New best validation loss: 3.7719 @ step 82
+[GPU 0] [07:56:42] [INFO] New best validation loss: 3.7715 @ step 83
+[GPU 0] [07:56:43] [INFO] New best validation loss: 3.7715 @ step 84
+[GPU 0] [07:56:43] [INFO] New best validation loss: 3.7715 @ step 85
+[GPU 0] [07:56:44] [INFO] New best validation loss: 3.7707 @ step 86
+[GPU 0] [07:56:44] [INFO] New best validation loss: 3.7703 @ step 87
+[GPU 0] [07:56:45] [INFO] New best validation loss: 3.7703 @ step 89
+[GPU 0] [07:56:45] [INFO] New best validation loss: 3.7699 @ step 90
+[GPU 0] [07:56:45] [INFO] New best validation loss: 3.7699 @ step 91
+[GPU 0] [07:56:46] [INFO] New best validation loss: 3.7695 @ step 92
+[GPU 0] [07:56:46] [INFO] New best validation loss: 3.7691 @ step 93
+[GPU 0] [07:56:46] [INFO] New best validation loss: 3.7691 @ step 94
+[GPU 0] [07:56:47] [INFO] New best validation loss: 3.7691 @ step 95
+[GPU 0] [07:56:47] [INFO] New best validation loss: 3.7691 @ step 96
+[GPU 0] [07:56:48] [INFO] New best validation loss: 3.7691 @ step 97
+[GPU 0] [07:56:48] [INFO] New best validation loss: 3.7691 @ step 98
+[GPU 0] [07:56:48] [INFO] New best validation loss: 3.7691 @ step 99
+[GPU 0] [07:56:49] [INFO] New best validation loss: 3.7691 @ step 100
+[GPU 0] [07:56:49] [INFO] New best validation loss: 3.7687 @ step 101
+[GPU 0] [07:56:49] [INFO] New best validation loss: 3.7684 @ step 102
+[GPU 0] [07:56:50] [INFO] New best validation loss: 3.7684 @ step 103
+[GPU 0] [07:56:50] [INFO] New best validation loss: 3.7684 @ step 104
+[GPU 0] [07:56:50] [INFO] New best validation loss: 3.7684 @ step 105
+[GPU 0] [07:56:51] [INFO] New best validation loss: 3.7684 @ step 106
+[GPU 0] [07:56:51] [INFO] New best validation loss: 3.7684 @ step 107
+[GPU 0] [07:56:51] [INFO] New best validation loss: 3.7684 @ step 108
+[GPU 0] [07:56:52] [INFO] New best validation loss: 3.7684 @ step 109
+[GPU 0] [07:56:52] [INFO] New best validation loss: 3.7684 @ step 110
+[GPU 0] [07:56:53] [INFO] New best validation loss: 3.7680 @ step 111
+[GPU 0] [07:56:53] [INFO] New best validation loss: 3.7676 @ step 112
+[GPU 0] [07:56:53] [INFO] New best validation loss: 3.7676 @ step 113
+[GPU 0] [07:56:54] [INFO] New best validation loss: 3.7676 @ step 114
+[GPU 0] [07:56:54] [INFO] New best validation loss: 3.7676 @ step 115
+[GPU 0] [07:56:54] [INFO] New best validation loss: 3.7676 @ step 116
+[GPU 0] [07:56:55] [INFO] New best validation loss: 3.7676 @ step 117
+[GPU 0] [07:56:55] [INFO] New best validation loss: 3.7676 @ step 118
+[GPU 0] [07:56:55] [INFO] New best validation loss: 3.7672 @ step 119
+[GPU 0] [07:56:56] [INFO] New best validation loss: 3.7664 @ step 120
+[GPU 0] [07:56:56] [INFO] New best validation loss: 3.7664 @ step 121
+[GPU 0] [07:56:56] [INFO] New best validation loss: 3.7664 @ step 122
+[GPU 0] [07:56:57] [INFO] New best validation loss: 3.7664 @ step 123
+[GPU 0] [07:56:57] [INFO] New best validation loss: 3.7664 @ step 124
+[GPU 0] [07:56:58] [INFO] New best validation loss: 3.7664 @ step 125
+[GPU 0] [07:56:58] [INFO] New best validation loss: 3.7656 @ step 126
+[GPU 0] [07:56:58] [INFO] New best validation loss: 3.7656 @ step 127
+[GPU 0] [07:56:59] [INFO] New best validation loss: 3.7648 @ step 128
+[GPU 0] [07:56:59] [INFO] New best validation loss: 3.7648 @ step 129
+[GPU 0] [07:56:59] [INFO] New best validation loss: 3.7645 @ step 130
+[GPU 0] [07:57:00] [INFO] New best validation loss: 3.7645 @ step 131
+[GPU 0] [07:57:00] [INFO] New best validation loss: 3.7641 @ step 132
+[GPU 0] [07:57:00] [INFO] New best validation loss: 3.7641 @ step 133
+[GPU 0] [07:57:01] [INFO] New best validation loss: 3.7641 @ step 134
+[GPU 0] [07:57:01] [INFO] New best validation loss: 3.7641 @ step 135
+[GPU 0] [07:57:01] [INFO] New best validation loss: 3.7641 @ step 136
+[GPU 0] [07:57:02] [INFO] New best validation loss: 3.7641 @ step 137
+[GPU 0] [07:57:02] [INFO] New best validation loss: 3.7641 @ step 138
+[GPU 0] [07:57:03] [INFO] New best validation loss: 3.7637 @ step 139
+[GPU 0] [07:57:03] [INFO] New best validation loss: 3.7637 @ step 140
+[GPU 0] [07:57:03] [INFO] New best validation loss: 3.7633 @ step 141
+[GPU 0] [07:57:04] [INFO] New best validation loss: 3.7633 @ step 142
+[GPU 0] [07:57:04] [INFO] New best validation loss: 3.7633 @ step 143
+[GPU 0] [07:57:04] [INFO] New best validation loss: 3.7629 @ step 144
+[GPU 0] [07:57:05] [INFO] New best validation loss: 3.7629 @ step 145
+[GPU 0] [07:57:05] [INFO] New best validation loss: 3.7629 @ step 146
+[GPU 0] [07:57:06] [INFO] New best validation loss: 3.7629 @ step 147
+[GPU 0] [07:57:06] [INFO] New best validation loss: 3.7629 @ step 148
+[GPU 0] [07:57:06] [INFO] New best validation loss: 3.7629 @ step 149
+[GPU 0] [07:57:07] [INFO] New best validation loss: 3.7629 @ step 150
+[GPU 0] [07:57:07] [INFO] New best validation loss: 3.7629 @ step 151
+[GPU 0] [07:57:07] [INFO] New best validation loss: 3.7629 @ step 152
+[GPU 0] [07:57:08] [INFO] New best validation loss: 3.7629 @ step 153
+[GPU 0] [07:57:08] [INFO] New best validation loss: 3.7629 @ step 154
+[GPU 0] [07:57:08] [INFO] New best validation loss: 3.7629 @ step 155
+[GPU 0] [07:57:09] [INFO] New best validation loss: 3.7629 @ step 156
+[GPU 0] [07:57:09] [INFO] New best validation loss: 3.7629 @ step 157
+[GPU 0] [07:57:10] [INFO] New best validation loss: 3.7621 @ step 158
+[GPU 0] [07:57:10] [INFO] New best validation loss: 3.7621 @ step 159
+[GPU 0] [07:57:10] [INFO] New best validation loss: 3.7621 @ step 160
+[GPU 0] [07:57:11] [INFO] New best validation loss: 3.7617 @ step 161
+[GPU 0] [07:57:11] [INFO] New best validation loss: 3.7617 @ step 162
+[GPU 0] [07:57:11] [INFO] New best validation loss: 3.7605 @ step 163
+[GPU 0] [07:57:12] [INFO] New best validation loss: 3.7605 @ step 165
+[GPU 0] [07:57:12] [INFO] New best validation loss: 3.7605 @ step 166
+[GPU 0] [07:57:13] [INFO] New best validation loss: 3.7598 @ step 167
+[GPU 0] [07:57:13] [INFO] New best validation loss: 3.7598 @ step 168
+[GPU 0] [07:57:13] [INFO] New best validation loss: 3.7598 @ step 169
+[GPU 0] [07:57:14] [INFO] New best validation loss: 3.7598 @ step 170
+[GPU 0] [07:57:14] [INFO] New best validation loss: 3.7598 @ step 171
+[GPU 0] [07:57:15] [INFO] New best validation loss: 3.7598 @ step 172
+[GPU 0] [07:57:15] [INFO] New best validation loss: 3.7594 @ step 173
+[GPU 0] [07:57:15] [INFO] New best validation loss: 3.7594 @ step 174
+[GPU 0] [07:57:16] [INFO] New best validation loss: 3.7594 @ step 175
+[GPU 0] [07:57:16] [INFO] New best validation loss: 3.7594 @ step 176
+[GPU 0] [07:57:16] [INFO] New best validation loss: 3.7594 @ step 177
+[GPU 0] [07:57:17] [INFO] New best validation loss: 3.7590 @ step 178
+[GPU 0] [07:57:17] [INFO] New best validation loss: 3.7590 @ step 179
+[GPU 0] [07:57:17] [INFO] New best validation loss: 3.7586 @ step 180
+[GPU 0] [07:57:18] [INFO] New best validation loss: 3.7582 @ step 181
+[GPU 0] [07:57:18] [INFO] New best validation loss: 3.7582 @ step 183
+[GPU 0] [07:57:19] [INFO] New best validation loss: 3.7582 @ step 184
+[GPU 0] [07:57:19] [INFO] New best validation loss: 3.7582 @ step 185
+[GPU 0] [07:57:20] [INFO] New best validation loss: 3.7582 @ step 186
+[GPU 0] [07:57:20] [INFO] New best validation loss: 3.7582 @ step 187
+[GPU 0] [07:57:20] [INFO] New best validation loss: 3.7578 @ step 188
+[GPU 0] [07:57:21] [INFO] New best validation loss: 3.7578 @ step 190
+[GPU 0] [07:57:21] [INFO] New best validation loss: 3.7578 @ step 191
+[GPU 0] [07:57:22] [INFO] New best validation loss: 3.7578 @ step 192
+[GPU 0] [07:57:22] [INFO] New best validation loss: 3.7578 @ step 193
+[GPU 0] [07:57:22] [INFO] New best validation loss: 3.7578 @ step 194
+[GPU 0] [07:57:23] [INFO] New best validation loss: 3.7578 @ step 195
+[GPU 0] [07:57:23] [INFO] New best validation loss: 3.7578 @ step 196
+[GPU 0] [07:57:23] [INFO] New best validation loss: 3.7578 @ step 197
+[GPU 0] [07:57:24] [INFO] New best validation loss: 3.7578 @ step 198
+[GPU 0] [07:57:24] [INFO] New best validation loss: 3.7578 @ step 199
+[GPU 0] [07:57:24] [INFO] Wrote stats.jsonl entries at FT step 199 
+[GPU 0] [07:57:24] [INFO] Stage [distill_diff_5m] start: {"model": {"arch": "base", "tokenizer": "TokenizersBackend(name_or_path='SimpleStories/SimpleStories-1.25M', vocab_size=4096, model_max_length=1000000000000000019884624838656, padding_side='right', truncation_side='right', special_tokens={'eos_token': '[EOS]', 'unk_token': '[UNK]'}, added_tokens_decoder={\n\t0: AddedToken(\"[UNK]\", rstrip=False, lstrip=False, single_word=False, normalized=False, special=True),\n\t1: AddedToken(\"[EOS]\", rstrip=False, lstrip=False, single_word=False, normalized=False, special=True),\n})", "ctx_len": 512, "vocab_size": 4096, "num_layers": 5, "num_heads": 8, "num_key_value": 2, "attn_bias": true, "eos_token_id": 1, "embed_dim": 256, "mlp_dim": 1024}, "train": {"lr": 0.0001, "bs": 64, "ctx_len": 512, "acc_steps": 1, "warmup_prc": 0.1, "decay_prc": 0.1, "epochs": 1, "adam_betas": [0.9, 0.95], "seed": 1, "num_tokens": 111086080}, "eval": {"run": true, "sample": false, "elicit": true, "num_train_evals": 200}, "name": "distill_diff_5m", "res_dir": "/workspace/modular-pretraining/results/distill/seed_1/20261005064940764364/distill_diff_5m", "retain_targets": [["core"]], "teacher": "base_20m", "teacher_type": "difference", "specialist": {"lr": 2.5e-05, "bs": 64, "ctx_len": 512, "acc_steps": 1, "warmup_prc": 0.1, "decay_prc": 0.1, "epochs": 1, "adam_betas": [0.9, 0.95], "seed": 1, "num_tokens": 9624764}, "alpha": 1.0, "temperature": 1.0}
+[GPU 0] [07:57:24] [INFO] DISTILL START
+[GPU 0] [07:57:24] [INFO] Distill: retaining ['core'], removing ['a-deadline-or-time-limit']
+[GPU 0] [07:57:24] [INFO] Distill: fine-tuning specialist on ['a-deadline-or-time-limit']
+[GPU 0] [07:57:25] [INFO] Compiling BaseTransformer with torch.compile...
+[GPU 0] [07:57:25] [INFO] ---- Begin Train | Train Labels: ['a-deadline-or-time-limit'] ----
+[GPU 0] [07:57:25] [INFO] num_total_steps: 146
+[GPU 0] [07:57:25] [INFO] warmup_steps: 15
+[GPU 0] [07:57:25] [INFO] constant_steps: 116
+[GPU 0] [07:57:25] [INFO] decay_steps: 15
+[GPU 0] [07:57:25] [INFO] LR Scheduler: Warmup Start
+[GPU 0] [07:57:25] [INFO] Step: 1, LR: 1.68e-06
+[GPU 0] [07:57:25] [INFO] Train Loss: 2.88
+[GPU 0] [07:57:26] [INFO] LR Scheduler: Constant Start
+[GPU 0] [07:57:38] [INFO] LR Scheduler: Decay Start
+[GPU 0] [07:57:39] [INFO] Step: 146, LR: 1.00e-08
+[GPU 0] [07:57:39] [INFO] Train Loss: 2.79
+[GPU 0] [07:57:41] [INFO] Initialized BaseTransformer with 5,554,304 total parameters
+[GPU 0] [07:57:41] [INFO] Compiling BaseTransformer with torch.compile...
+[GPU 0] [07:57:41] [INFO] ---- Begin Distill | Train Labels: ['core'] | anti-teacher: True | alpha: 1.0 | T: 1.0 ----
+[GPU 0] [07:57:41] [INFO] num_total_steps: 1695
+[GPU 0] [07:57:41] [INFO] warmup_steps: 170
+[GPU 0] [07:57:41] [INFO] constant_steps: 1355
+[GPU 0] [07:57:41] [INFO] decay_steps: 170
+[GPU 0] [07:57:41] [INFO] LR Scheduler: Warmup Start
+[GPU 0] [07:57:41] [INFO] Step: 1, LR: 5.98e-07, Train KL: 5.013, Val CE: 
+[GPU 0] [07:58:17] [INFO] LR Scheduler: Constant Start
+[GPU 0] [08:01:11] [INFO] Step: 1000, LR: 1.00e-04, Train KL: 0.706, Val CE: CORE: 3.79 A-DEADLINE-OR-TIME-LIMIT: 3.93
+[GPU 0] [08:03:00] [INFO] LR Scheduler: Decay Start
+[GPU 0] [08:03:36] [INFO] Step: 1695, LR: 1.00e-08, Train KL: 0.607, Val CE: CORE: 3.67 A-DEADLINE-OR-TIME-LIMIT: 3.82
+[GPU 0] [08:03:36] [INFO] ---- Begin Eval ----
+[GPU 0] [08:03:36] [INFO] Data: core | Experts: None
+[GPU 0] [08:03:46] [INFO] loss: 3.67336679
+[GPU 0] [08:03:46] [INFO] Data: a-deadline-or-time-limit | Experts: None
+[GPU 0] [08:03:47] [INFO] loss: 3.82617188
+[GPU 0] [08:03:47] [INFO] DISTILL - ADVERSARIAL FT START
+[GPU 0] [08:03:47] [INFO] Compiling BaseTransformer with torch.compile...
+[GPU 0] [08:03:47] [INFO] ---- Begin FT | Experts: None | Data: ['a-deadline-or-time-limit'] ----
+[GPU 0] [08:03:47] [DEBUG] num_seq: 512, num_rounds: 200, patience: 10
+[GPU 0] [08:03:47] [WARNING] Resampling ['a-deadline-or-time-limit'] (train) to fill the token budget: 22,705 -> 216,960 seqs (9.56x)
+[GPU 0] [08:03:47] [DEBUG] 4 micro-batches of 64 seqs per rank
+[GPU 0] [08:03:47] [INFO] New best validation loss: 3.8535 @ step 0
+[GPU 0] [08:03:48] [INFO] New best validation loss: 3.8273 @ step 1
+[GPU 0] [08:03:48] [INFO] New best validation loss: 3.8242 @ step 2
+[GPU 0] [08:03:49] [INFO] New best validation loss: 3.8219 @ step 4
+[GPU 0] [08:03:49] [INFO] New best validation loss: 3.8164 @ step 5
+[GPU 0] [08:03:49] [INFO] New best validation loss: 3.8137 @ step 6
+[GPU 0] [08:03:50] [INFO] New best validation loss: 3.8121 @ step 7
+[GPU 0] [08:03:50] [INFO] New best validation loss: 3.8121 @ step 8
+[GPU 0] [08:03:51] [INFO] New best validation loss: 3.8117 @ step 9
+[GPU 0] [08:03:51] [INFO] New best validation loss: 3.8117 @ step 10
+[GPU 0] [08:03:51] [INFO] New best validation loss: 3.8105 @ step 11
+[GPU 0] [08:03:52] [INFO] New best validation loss: 3.8090 @ step 12
+[GPU 0] [08:03:52] [INFO] New best validation loss: 3.8078 @ step 13
+[GPU 0] [08:03:52] [INFO] New best validation loss: 3.8074 @ step 14
+[GPU 0] [08:03:53] [INFO] New best validation loss: 3.8066 @ step 15
+[GPU 0] [08:03:53] [INFO] New best validation loss: 3.8063 @ step 16
+[GPU 0] [08:03:53] [INFO] New best validation loss: 3.8055 @ step 17
+[GPU 0] [08:03:54] [INFO] New best validation loss: 3.8047 @ step 18
+[GPU 0] [08:03:54] [INFO] New best validation loss: 3.8039 @ step 19
+[GPU 0] [08:03:54] [INFO] New best validation loss: 3.8020 @ step 20
+[GPU 0] [08:03:55] [INFO] New best validation loss: 3.8008 @ step 21
+[GPU 0] [08:03:55] [INFO] New best validation loss: 3.8008 @ step 22
+[GPU 0] [08:03:56] [INFO] New best validation loss: 3.8000 @ step 23
+[GPU 0] [08:03:56] [INFO] New best validation loss: 3.8000 @ step 24
+[GPU 0] [08:03:56] [INFO] New best validation loss: 3.7992 @ step 25
+[GPU 0] [08:03:57] [INFO] New best validation loss: 3.7988 @ step 26
+[GPU 0] [08:03:57] [INFO] New best validation loss: 3.7984 @ step 27
+[GPU 0] [08:03:57] [INFO] New best validation loss: 3.7977 @ step 28
+[GPU 0] [08:03:58] [INFO] New best validation loss: 3.7973 @ step 29
+[GPU 0] [08:03:58] [INFO] New best validation loss: 3.7973 @ step 30
+[GPU 0] [08:03:58] [INFO] New best validation loss: 3.7973 @ step 31
+[GPU 0] [08:03:59] [INFO] New best validation loss: 3.7973 @ step 32
+[GPU 0] [08:03:59] [INFO] New best validation loss: 3.7969 @ step 33
+[GPU 0] [08:03:59] [INFO] New best validation loss: 3.7961 @ step 34
+[GPU 0] [08:04:00] [INFO] New best validation loss: 3.7961 @ step 35
+[GPU 0] [08:04:00] [INFO] New best validation loss: 3.7961 @ step 36
+[GPU 0] [08:04:01] [INFO] New best validation loss: 3.7957 @ step 37
+[GPU 0] [08:04:01] [INFO] New best validation loss: 3.7949 @ step 38
+[GPU 0] [08:04:01] [INFO] New best validation loss: 3.7945 @ step 39
+[GPU 0] [08:04:02] [INFO] New best validation loss: 3.7945 @ step 40
+[GPU 0] [08:04:02] [INFO] New best validation loss: 3.7941 @ step 41
+[GPU 0] [08:04:02] [INFO] New best validation loss: 3.7941 @ step 42
+[GPU 0] [08:04:03] [INFO] New best validation loss: 3.7941 @ step 43
+[GPU 0] [08:04:03] [INFO] New best validation loss: 3.7934 @ step 44
+[GPU 0] [08:04:03] [INFO] New best validation loss: 3.7934 @ step 45
+[GPU 0] [08:04:04] [INFO] New best validation loss: 3.7934 @ step 46
+[GPU 0] [08:04:04] [INFO] New best validation loss: 3.7930 @ step 47
+[GPU 0] [08:04:04] [INFO] New best validation loss: 3.7918 @ step 48
+[GPU 0] [08:04:05] [INFO] New best validation loss: 3.7918 @ step 49
+[GPU 0] [08:04:05] [INFO] New best validation loss: 3.7918 @ step 50
+[GPU 0] [08:04:06] [INFO] New best validation loss: 3.7910 @ step 51
+[GPU 0] [08:04:06] [INFO] New best validation loss: 3.7910 @ step 52
+[GPU 0] [08:04:06] [INFO] New best validation loss: 3.7906 @ step 53
+[GPU 0] [08:04:07] [INFO] New best validation loss: 3.7906 @ step 54
+[GPU 0] [08:04:07] [INFO] New best validation loss: 3.7906 @ step 55
+[GPU 0] [08:04:07] [INFO] New best validation loss: 3.7898 @ step 56
+[GPU 0] [08:04:08] [INFO] New best validation loss: 3.7898 @ step 57
+[GPU 0] [08:04:08] [INFO] New best validation loss: 3.7898 @ step 58
+[GPU 0] [08:04:08] [INFO] New best validation loss: 3.7895 @ step 59
+[GPU 0] [08:04:09] [INFO] New best validation loss: 3.7895 @ step 60
+[GPU 0] [08:04:09] [INFO] New best validation loss: 3.7895 @ step 61
+[GPU 0] [08:04:09] [INFO] New best validation loss: 3.7891 @ step 62
+[GPU 0] [08:04:10] [INFO] New best validation loss: 3.7883 @ step 63
+[GPU 0] [08:04:10] [INFO] New best validation loss: 3.7883 @ step 64
+[GPU 0] [08:04:11] [INFO] New best validation loss: 3.7871 @ step 65
+[GPU 0] [08:04:11] [INFO] New best validation loss: 3.7867 @ step 66
+[GPU 0] [08:04:11] [INFO] New best validation loss: 3.7867 @ step 67
+[GPU 0] [08:04:12] [INFO] New best validation loss: 3.7859 @ step 68
+[GPU 0] [08:04:12] [INFO] New best validation loss: 3.7859 @ step 69
+[GPU 0] [08:04:12] [INFO] New best validation loss: 3.7852 @ step 70
+[GPU 0] [08:04:13] [INFO] New best validation loss: 3.7852 @ step 71
+[GPU 0] [08:04:13] [INFO] New best validation loss: 3.7852 @ step 72
+[GPU 0] [08:04:13] [INFO] New best validation loss: 3.7852 @ step 73
+[GPU 0] [08:04:14] [INFO] New best validation loss: 3.7852 @ step 74
+[GPU 0] [08:04:14] [INFO] New best validation loss: 3.7848 @ step 75
+[GPU 0] [08:04:14] [INFO] New best validation loss: 3.7844 @ step 76
+[GPU 0] [08:04:15] [INFO] New best validation loss: 3.7840 @ step 77
+[GPU 0] [08:04:15] [INFO] New best validation loss: 3.7840 @ step 78
+[GPU 0] [08:04:16] [INFO] New best validation loss: 3.7840 @ step 79
+[GPU 0] [08:04:16] [INFO] New best validation loss: 3.7836 @ step 80
+[GPU 0] [08:04:16] [INFO] New best validation loss: 3.7836 @ step 81
+[GPU 0] [08:04:17] [INFO] New best validation loss: 3.7836 @ step 82
+[GPU 0] [08:04:17] [INFO] New best validation loss: 3.7836 @ step 83
+[GPU 0] [08:04:17] [INFO] New best validation loss: 3.7836 @ step 84
+[GPU 0] [08:04:18] [INFO] New best validation loss: 3.7836 @ step 85
+[GPU 0] [08:04:18] [INFO] New best validation loss: 3.7832 @ step 86
+[GPU 0] [08:04:18] [INFO] New best validation loss: 3.7832 @ step 87
+[GPU 0] [08:04:19] [INFO] New best validation loss: 3.7820 @ step 88
+[GPU 0] [08:04:19] [INFO] New best validation loss: 3.7816 @ step 89
+[GPU 0] [08:04:19] [INFO] New best validation loss: 3.7816 @ step 90
+[GPU 0] [08:04:20] [INFO] New best validation loss: 3.7816 @ step 91
+[GPU 0] [08:04:20] [INFO] New best validation loss: 3.7816 @ step 92
+[GPU 0] [08:04:20] [INFO] New best validation loss: 3.7816 @ step 93
+[GPU 0] [08:04:21] [INFO] New best validation loss: 3.7816 @ step 94
+[GPU 0] [08:04:21] [INFO] New best validation loss: 3.7816 @ step 95
+[GPU 0] [08:04:22] [INFO] New best validation loss: 3.7812 @ step 96
+[GPU 0] [08:04:22] [INFO] New best validation loss: 3.7812 @ step 97
+[GPU 0] [08:04:22] [INFO] New best validation loss: 3.7809 @ step 98
+[GPU 0] [08:04:23] [INFO] New best validation loss: 3.7805 @ step 99
+[GPU 0] [08:04:23] [INFO] New best validation loss: 3.7801 @ step 100
+[GPU 0] [08:04:23] [INFO] New best validation loss: 3.7801 @ step 101
+[GPU 0] [08:04:24] [INFO] New best validation loss: 3.7801 @ step 102
+[GPU 0] [08:04:24] [INFO] New best validation loss: 3.7801 @ step 103
+[GPU 0] [08:04:24] [INFO] New best validation loss: 3.7801 @ step 104
+[GPU 0] [08:04:25] [INFO] New best validation loss: 3.7797 @ step 105
+[GPU 0] [08:04:25] [INFO] New best validation loss: 3.7793 @ step 106
+[GPU 0] [08:04:25] [INFO] New best validation loss: 3.7793 @ step 107
+[GPU 0] [08:04:26] [INFO] New best validation loss: 3.7793 @ step 108
+[GPU 0] [08:04:26] [INFO] New best validation loss: 3.7793 @ step 109
+[GPU 0] [08:04:27] [INFO] New best validation loss: 3.7793 @ step 110
+[GPU 0] [08:04:27] [INFO] New best validation loss: 3.7789 @ step 111
+[GPU 0] [08:04:27] [INFO] New best validation loss: 3.7789 @ step 112
+[GPU 0] [08:04:28] [INFO] New best validation loss: 3.7789 @ step 113
+[GPU 0] [08:04:28] [INFO] New best validation loss: 3.7789 @ step 114
+[GPU 0] [08:04:28] [INFO] New best validation loss: 3.7789 @ step 115
+[GPU 0] [08:04:29] [INFO] New best validation loss: 3.7789 @ step 116
+[GPU 0] [08:04:29] [INFO] New best validation loss: 3.7789 @ step 117
+[GPU 0] [08:04:29] [INFO] New best validation loss: 3.7789 @ step 118
+[GPU 0] [08:04:30] [INFO] New best validation loss: 3.7789 @ step 119
+[GPU 0] [08:04:30] [INFO] New best validation loss: 3.7785 @ step 120
+[GPU 0] [08:04:30] [INFO] New best validation loss: 3.7785 @ step 121
+[GPU 0] [08:04:31] [INFO] New best validation loss: 3.7785 @ step 122
+[GPU 0] [08:04:31] [INFO] New best validation loss: 3.7785 @ step 123
+[GPU 0] [08:04:32] [INFO] New best validation loss: 3.7781 @ step 124
+[GPU 0] [08:04:32] [INFO] New best validation loss: 3.7781 @ step 125
+[GPU 0] [08:04:32] [INFO] New best validation loss: 3.7781 @ step 126
+[GPU 0] [08:04:33] [INFO] New best validation loss: 3.7781 @ step 127
+[GPU 0] [08:04:33] [INFO] New best validation loss: 3.7781 @ step 128
+[GPU 0] [08:04:33] [INFO] New best validation loss: 3.7777 @ step 129
+[GPU 0] [08:04:34] [INFO] New best validation loss: 3.7773 @ step 130
+[GPU 0] [08:04:34] [INFO] New best validation loss: 3.7773 @ step 131
+[GPU 0] [08:04:34] [INFO] New best validation loss: 3.7773 @ step 132
+[GPU 0] [08:04:35] [INFO] New best validation loss: 3.7773 @ step 133
+[GPU 0] [08:04:35] [INFO] New best validation loss: 3.7773 @ step 134
+[GPU 0] [08:04:35] [INFO] New best validation loss: 3.7773 @ step 135
+[GPU 0] [08:04:36] [INFO] New best validation loss: 3.7773 @ step 136
+[GPU 0] [08:04:36] [INFO] New best validation loss: 3.7770 @ step 137
+[GPU 0] [08:04:37] [INFO] New best validation loss: 3.7762 @ step 138
+[GPU 0] [08:04:37] [INFO] New best validation loss: 3.7754 @ step 139
+[GPU 0] [08:04:37] [INFO] New best validation loss: 3.7754 @ step 140
+[GPU 0] [08:04:38] [INFO] New best validation loss: 3.7754 @ step 141
+[GPU 0] [08:04:38] [INFO] New best validation loss: 3.7750 @ step 142
+[GPU 0] [08:04:38] [INFO] New best validation loss: 3.7746 @ step 143
+[GPU 0] [08:04:39] [INFO] New best validation loss: 3.7746 @ step 144
+[GPU 0] [08:04:39] [INFO] New best validation loss: 3.7746 @ step 145
+[GPU 0] [08:04:39] [INFO] New best validation loss: 3.7746 @ step 146
+[GPU 0] [08:04:40] [INFO] New best validation loss: 3.7742 @ step 147
+[GPU 0] [08:04:40] [INFO] New best validation loss: 3.7742 @ step 148
+[GPU 0] [08:04:40] [INFO] New best validation loss: 3.7738 @ step 149
+[GPU 0] [08:04:41] [INFO] New best validation loss: 3.7738 @ step 150
+[GPU 0] [08:04:41] [INFO] New best validation loss: 3.7738 @ step 151
+[GPU 0] [08:04:42] [INFO] New best validation loss: 3.7738 @ step 152
+[GPU 0] [08:04:42] [INFO] New best validation loss: 3.7738 @ step 153
+[GPU 0] [08:04:42] [INFO] New best validation loss: 3.7738 @ step 154
+[GPU 0] [08:04:43] [INFO] New best validation loss: 3.7738 @ step 155
+[GPU 0] [08:04:43] [INFO] New best validation loss: 3.7738 @ step 156
+[GPU 0] [08:04:43] [INFO] New best validation loss: 3.7738 @ step 157
+[GPU 0] [08:04:44] [INFO] New best validation loss: 3.7738 @ step 158
+[GPU 0] [08:04:44] [INFO] New best validation loss: 3.7734 @ step 159
+[GPU 0] [08:04:44] [INFO] New best validation loss: 3.7734 @ step 160
+[GPU 0] [08:04:45] [INFO] New best validation loss: 3.7734 @ step 161
+[GPU 0] [08:04:45] [INFO] New best validation loss: 3.7734 @ step 162
+[GPU 0] [08:04:45] [INFO] New best validation loss: 3.7734 @ step 163
+[GPU 0] [08:04:46] [INFO] New best validation loss: 3.7730 @ step 164
+[GPU 0] [08:04:46] [INFO] New best validation loss: 3.7730 @ step 165
+[GPU 0] [08:04:47] [INFO] New best validation loss: 3.7730 @ step 166
+[GPU 0] [08:04:47] [INFO] New best validation loss: 3.7727 @ step 167
+[GPU 0] [08:04:47] [INFO] New best validation loss: 3.7723 @ step 168
+[GPU 0] [08:04:48] [INFO] New best validation loss: 3.7723 @ step 169
+[GPU 0] [08:04:48] [INFO] New best validation loss: 3.7723 @ step 170
+[GPU 0] [08:04:48] [INFO] New best validation loss: 3.7719 @ step 171
+[GPU 0] [08:04:49] [INFO] New best validation loss: 3.7719 @ step 172
+[GPU 0] [08:04:49] [INFO] New best validation loss: 3.7719 @ step 173
+[GPU 0] [08:04:49] [INFO] New best validation loss: 3.7719 @ step 174
+[GPU 0] [08:04:50] [INFO] New best validation loss: 3.7719 @ step 175
+[GPU 0] [08:04:50] [INFO] New best validation loss: 3.7719 @ step 176
+[GPU 0] [08:04:50] [INFO] New best validation loss: 3.7719 @ step 177
+[GPU 0] [08:04:51] [INFO] New best validation loss: 3.7715 @ step 178
+[GPU 0] [08:04:51] [INFO] New best validation loss: 3.7715 @ step 179
+[GPU 0] [08:04:51] [INFO] New best validation loss: 3.7715 @ step 180
+[GPU 0] [08:04:52] [INFO] New best validation loss: 3.7715 @ step 181
+[GPU 0] [08:04:52] [INFO] New best validation loss: 3.7715 @ step 182
+[GPU 0] [08:04:53] [INFO] New best validation loss: 3.7715 @ step 183
+[GPU 0] [08:04:53] [INFO] New best validation loss: 3.7707 @ step 184
+[GPU 0] [08:04:53] [INFO] New best validation loss: 3.7703 @ step 185
+[GPU 0] [08:04:54] [INFO] New best validation loss: 3.7699 @ step 186
+[GPU 0] [08:04:54] [INFO] New best validation loss: 3.7699 @ step 187
+[GPU 0] [08:04:54] [INFO] New best validation loss: 3.7699 @ step 188
+[GPU 0] [08:04:55] [INFO] New best validation loss: 3.7699 @ step 189
+[GPU 0] [08:04:55] [INFO] New best validation loss: 3.7699 @ step 190
+[GPU 0] [08:04:55] [INFO] New best validation loss: 3.7695 @ step 191
+[GPU 0] [08:04:56] [INFO] New best validation loss: 3.7695 @ step 192
+[GPU 0] [08:04:56] [INFO] New best validation loss: 3.7695 @ step 193
+[GPU 0] [08:04:56] [INFO] New best validation loss: 3.7695 @ step 194
+[GPU 0] [08:04:57] [INFO] New best validation loss: 3.7695 @ step 195
+[GPU 0] [08:04:57] [INFO] New best validation loss: 3.7691 @ step 196
+[GPU 0] [08:04:58] [INFO] New best validation loss: 3.7691 @ step 197
+[GPU 0] [08:04:58] [INFO] New best validation loss: 3.7691 @ step 198
+[GPU 0] [08:04:58] [INFO] New best validation loss: 3.7687 @ step 199
+[GPU 0] [08:04:58] [INFO] Wrote stats.jsonl entries at FT step 199 
+[GPU 0] [08:04:59] [INFO] ----------------------------------------
+[GPU 0] [08:04:59] [INFO] Finished. See /workspace/modular-pretraining/results/distill/seed_1/20261005064940764364

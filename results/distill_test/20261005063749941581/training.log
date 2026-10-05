@@ -1,0 +1,24 @@
+[GPU 0] [06:37:50] [INFO] Git branch: main, commit: d07d62e9869c6a969a2306e755aba7a742c317fd
+[GPU 0] [06:37:50] [INFO] Number of GPUs: 2
+[GPU 0] [06:37:51] [INFO] Tokenizer vocabulary: 4096
+[GPU 0] [06:37:51] [INFO] Set model vocab size to nearest multiple of 64 of tokenizer size: 4096
+[GPU 0] [06:37:51] [INFO] Stage [base_20m] start: {"model": {"arch": "base", "tokenizer": "TokenizersBackend(name_or_path='SimpleStories/SimpleStories-1.25M', vocab_size=4096, model_max_length=1000000000000000019884624838656, padding_side='right', truncation_side='right', special_tokens={'eos_token': '[EOS]', 'unk_token': '[UNK]'}, added_tokens_decoder={\n\t0: AddedToken(\"[UNK]\", rstrip=False, lstrip=False, single_word=False, normalized=False, special=True),\n\t1: AddedToken(\"[EOS]\", rstrip=False, lstrip=False, single_word=False, normalized=False, special=True),\n})", "ctx_len": 512, "vocab_size": 4096, "num_layers": 9, "num_heads": 8, "num_key_value": 2, "attn_bias": true, "eos_token_id": 1, "embed_dim": 448, "mlp_dim": 1792}, "train": {"lr": 0.0001, "bs": 64, "ctx_len": 512, "acc_steps": 1, "warmup_prc": 0.1, "decay_prc": 0.1, "epochs": 1, "adam_betas": [0.9, 0.95], "seed": 1, "num_tokens": 22679392}, "eval": {"run": true, "sample": false, "elicit": false, "num_train_evals": 10}, "name": "base_20m", "res_dir": "/workspace/modular-pretraining/results/distill_test/20261005063749941581/base_20m"}
+[GPU 0] [06:37:51] [INFO] BASELINE START
+[GPU 0] [06:37:51] [INFO] Initialized BaseTransformer with 22,679,392 total parameters
+[GPU 0] [06:37:51] [INFO] Compiling BaseTransformer with torch.compile...
+[GPU 0] [06:37:52] [INFO] ---- Begin Train | Train Labels: ['a-deadline-or-time-limit', 'core'] ----
+[GPU 0] [06:37:52] [INFO] num_total_steps: 346
+[GPU 0] [06:37:52] [INFO] warmup_steps: 35
+[GPU 0] [06:37:52] [INFO] constant_steps: 276
+[GPU 0] [06:37:52] [INFO] decay_steps: 35
+[GPU 0] [06:37:52] [INFO] LR Scheduler: Warmup Start
+[GPU 0] [06:38:19] [INFO] Step: 1, LR: 2.87e-06
+[GPU 0] [06:38:19] [INFO] Train Loss: 8.44
+[GPU 0] [06:38:19] [INFO] Val Loss: CORE: nan A-DEADLINE-OR-TIME-LIMIT: nan 
+[GPU 0] [06:38:22] [INFO] LR Scheduler: Constant Start
+[GPU 0] [06:39:14] [INFO] LR Scheduler: Decay Start
+[GPU 0] [06:39:20] [INFO] Step: 346, LR: 1.00e-08
+[GPU 0] [06:39:20] [INFO] Train Loss: 3.86
+[GPU 0] [06:39:20] [INFO] Val Loss: CORE: 3.90 A-DEADLINE-OR-TIME-LIMIT: 4.00 
+[GPU 0] [06:39:20] [INFO] ---- Begin Eval ----
+[GPU 0] [06:39:20] [INFO] Data: core | Experts: None

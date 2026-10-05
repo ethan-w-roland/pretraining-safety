@@ -25,7 +25,7 @@ src/                          Training + evaluation code
     lora.py                   LoRA adapters (FT-LoRA, GRAM-LoRA)
     demix.py                  DEMix domain experts (comparison)
   run/
-    main.py                   Core pipeline: runs a sequence of stages, auto-resume, preemption-safe
+    main.py                   Core pipeline: runs a sequence of stages
     train/                    Per-method training runners
       base.py                 baseline + filtering
       routed.py               GRAM (moe / lora / demix)
@@ -33,7 +33,7 @@ src/                          Training + evaluation code
       maxent.py, rmu.py, ascent.py   post-hoc unlearning
       finetune.py             adversarial elicitation (elicited-forget metric)
     experiment/               One subpackage per paper experiment (defines stages, launches main.run)
-    util/                     DDP, dataloaders, checkpointing, S3, preemption
+    util/                     DDP, dataloaders, checkpointing
 analysis/                     Plotting + aggregation → the paper's TikZ/PNG figures
 results/                      Per-run metrics (losses, configs, eval outputs); checkpoints excluded
 ```
@@ -93,7 +93,7 @@ torchrun --nproc_per_node=8 -m src.run.experiment.partial.run
 torchrun --nproc_per_node=8 -m src.run.main
 ```
 
-Training is **preemption-safe**: on `SIGTERM` (e.g. Slurm preemption) a checkpoint is saved and the run auto-resumes from the latest stage/checkpoint on requeue.
+Each run trains all of its stages from scratch into a fresh results directory, saving one final `checkpoint.pth` per stage (or stage iteration); there is no resume from interrupted runs.
 
 ## Reproducing figures
 
