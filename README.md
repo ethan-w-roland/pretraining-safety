@@ -64,12 +64,12 @@ Performance is reported as **compute ratio**: the fraction of baseline training 
 
 ## Setup
 
-There is no packaged manifest; install the dependencies into a fresh environment (uv recommended):
+Dependencies are declared in `pyproject.toml` and pinned in `uv.lock`; torch comes from the CUDA 12.8 wheel index:
 
 ```bash
-uv venv && source .venv/bin/activate
-uv pip install torch transformers datasets huggingface_hub numpy scipy \
-               matplotlib tqdm python-dotenv     # analysis also uses matplot2tikz
+uv sync                    # training
+uv sync --extra data       # + data prep (src/data/prep_*.py)
+uv sync --all-extras       # + analysis/plotting
 ```
 
 Create a `.env` at the **repository root** (git-ignored) with a HuggingFace token for data access:
