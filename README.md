@@ -1,2 +1,2 @@
-# Pretraining Alignment Test Task
-Ethan Roland, 2026-10-05
+# Distillation Time Alignment Experiments
+Ethan Roland, 2026
