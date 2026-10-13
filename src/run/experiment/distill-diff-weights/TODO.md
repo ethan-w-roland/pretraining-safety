@@ -1,0 +1,1 @@
+so distill-diff works during distillation to clean a learning signal. Can you cheaply clean the same model by subtracting the forget-finetuned model weights from the original model?

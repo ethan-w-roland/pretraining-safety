@@ -22,7 +22,7 @@ import torch
 from typing import Any, Iterable, Optional
 from tqdm.auto import tqdm
 
-from src.model.config import Transformer
+from src.model.config import ROUTED_ARCHS, Transformer
 from src.run.eval import eval_loss
 from src.run.util.config import ExperimentConfig, StageConfig
 from src.run.util.data import make_loader
@@ -64,7 +64,7 @@ def do_elicit(
     assert all(label in labels for label in data_labels), f"all data labels must be in {labels}"
 
     raw_model = get_raw_model(model)
-    model_type = type(raw_model).__name__
+    is_routed = raw_model.config.arch in ROUTED_ARCHS
     model.train()
 
     opt = torch.optim.AdamW(model.parameters(), lr=lr, fused=True)
@@ -91,7 +91,7 @@ def do_elicit(
             no_sync_ctx = model.no_sync() if (is_ddp and not is_last) else contextlib.nullcontext()
 
             with no_sync_ctx:
-                if model_type in ("MoETransformer", "LoRATransformer", "DemixTransformer"):
+                if is_routed:
                     fwd_mask = get_exp_mask(labels, expert_labels, device=x.device)
                     bck_mask = get_exp_mask(labels, expert_labels, device=x.device)
                     loss = model(x, targets=y, fwd_mask=fwd_mask, bck_mask=bck_mask)[1]

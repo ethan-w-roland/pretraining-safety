@@ -6,7 +6,7 @@ from typing import Any, Iterable, Optional
 from tqdm import tqdm
 
 from src.run.util.config import ExperimentConfig, StageConfig
-from src.model.config import Transformer
+from src.model.config import ROUTED_ARCHS, Transformer
 from src.run.util.data import make_loader
 from src.run.util.tools import log_line, get_exp_mask, json_safe
 from src.run.util.logger import get_tqdm_kwargs
@@ -40,9 +40,9 @@ def eval_loss(
     loader = make_loader(config, stage, [data_label], split)
     loader.reset(shuffle_seed)
 
-    # Get raw model for accessing config and model_type
+    # Get raw model for accessing config
     raw_model = get_raw_model(model)
-    model_type = type(raw_model).__name__
+    is_routed = raw_model.config.arch in ROUTED_ARCHS
 
     total_loss = 0.0
     max_batches = len(loader)
@@ -60,7 +60,7 @@ def eval_loss(
 
     for _, x, y in itertools.islice(loader, num_batches):
 
-        if model_type in ("MoETransformer", "LoRATransformer", "DemixTransformer"):
+        if is_routed:
 
             fwd_mask = get_exp_mask(
                 labels=labels,
@@ -165,7 +165,7 @@ def generate_samples(
         max_new_tokens = raw_model.config.ctx_len - max_prompt_len
 
         for _ in tqdm(range(max_new_tokens), **get_tqdm_kwargs(logger, desc=f"Generating samples | Data: {data_label}", ncols=100)):
-            if raw_model.config.arch in ("moe", "lora", "demix"):
+            if raw_model.config.arch in ROUTED_ARCHS:
                 labels = config.data.labels
 
                 fwd_mask = get_exp_mask(labels, expert_labels, device=prompt_batch.device)

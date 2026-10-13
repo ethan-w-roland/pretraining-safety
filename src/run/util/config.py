@@ -69,12 +69,18 @@ hf_logging.set_verbosity_error()
 @dataclass
 class TrainConfig:
     """Configuration for training."""
-    lr: float = 1e-4
+    lr: float = 3e-4 # AdamW LR for embeddings/head/norms; Muon handles hidden matrices
+    muon_lr: float = 1e-3 # base LR before Trinity's per-matrix shape adjustment
+    muon_momentum: float = 0.95
+    muon_ns_steps: int = 5
+    weight_decay: float = 0.1
     bs: int = 128
     ctx_len: int = 512
     acc_steps: int = 1 # effective batch size = bs * acc_steps * num_gpus
     warmup_prc: float = 0.1
+    warmup_steps: int = 2000 # cap on fractional warmup duration
     decay_prc: float = 0.1
+    min_lr_ratio: float = 0.0
     epochs: int = 1
     adam_betas: tuple[float, float] = (0.9, 0.95)
     seed: int = 42
@@ -263,6 +269,11 @@ def setup(config: ExperimentConfig) -> ExperimentConfig:
     # Update model config for each stage
     for stage in config.stages:
         assert isinstance(stage.model, ModelConfig), f"Stage {stage.res_dir.name} must declare a model config"
+        if stage.model.tokenizer_name is not None:
+            assert stage.model.tokenizer_name == tokenizer.name_or_path, (
+                f"Stage {stage.res_dir.name} model is sized for tokenizer {stage.model.tokenizer_name!r} "
+                f"but the dataset uses {tokenizer.name_or_path!r}"
+            )
         stage.model.tokenizer = tokenizer
         stage.model.vocab_size = vocab_size
   

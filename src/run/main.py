@@ -39,6 +39,7 @@ import warnings
 import torch
 
 from src.model.base import BaseTransformer
+from src.model.moe import MoETransformer
 from src.model.config import Transformer
 from src.model.utils import copy_model, load_model, make_model
 from src.run.eval import do_eval
@@ -49,6 +50,8 @@ from src.run.util.distributed import barrier, get_raw_model
 from src.run.train.base import BaselineConfig, FilteringConfig, do_train
 from src.run.train.elicit import do_elicit
 from src.run.train.distill import DistillConfig, do_distill
+from src.run.train.routing import RoutingConfig, do_routing, expert_configurations
+from src.run.util.tools import set_seeds
 warnings.filterwarnings("ignore", message=r"(?s).*Online softmax is disabled.*", category=UserWarning)
 
 def run_experiment(
@@ -113,7 +116,7 @@ def run_elicitation(
 ) -> None:
     """Elicitation: copy model per label, finetune, eval, cleanup."""
 
-    model = get_raw_model(model).to("cpu", dtype=torch.bfloat16)
+    model = get_raw_model(model).to("cpu")
     torch.cuda.empty_cache()
 
     save_dir = cur_dir / "elicit"
@@ -168,6 +171,7 @@ def run_baseline(
 
     logger.info("BASELINE START")
 
+    set_seeds(stage.train.seed)
     model = make_model(BaseTransformer, stage.model, config)
 
     model = run_experiment(
@@ -225,6 +229,7 @@ def run_filtering(
 
         logger.info(f"Filtering: retaining {retained}, removing {removed}")
 
+        set_seeds(stage.train.seed)
         model = make_model(BaseTransformer, stage.model, config)
 
         iter_dir = stage.res_dir / iter_name
@@ -359,10 +364,44 @@ def run_distill(
 # Pipeline dispatcher
 # ---------------------------------------------------------------------------
 
+def run_routing(stage: RoutingConfig, config: ExperimentConfig) -> None:
+    """Train GR-MLP, evaluate each expert configuration, and elicit core only."""
+    assert stage.model.arch == "moe", "RoutingConfig currently supports GR-MLP (moe)"
+    set_seeds(stage.train.seed)
+    model = make_model(
+        MoETransformer, stage.model, config,
+        extra_args={"labels": config.data.labels},
+    )
+    model = run_experiment(
+        stage=stage,
+        model=model,
+        config=config,
+        func=do_routing,
+        eval_configs=[{
+            "expert_labels": experts,
+            "log": {"retained": experts, "finetune": None, "elicited": False},
+        } for experts in expert_configurations(config.data.labels)],
+    )
+    if stage.eval.elicit:
+        run_elicitation(
+            stage=stage,
+            cur_dir=stage.res_dir,
+            model=model,
+            config=config,
+            data_labels=config.data.aux,
+            expert_labels=["core"],
+            log_extra={"retained": ["core"]},
+        )
+    del model
+    torch.cuda.empty_cache()
+    barrier()
+
+
 RUNNERS = {
     BaselineConfig: run_baseline,
     FilteringConfig: run_filtering,
     DistillConfig: run_distill,
+    RoutingConfig: run_routing,
 }
 
 

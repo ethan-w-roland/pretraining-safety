@@ -1,15 +1,15 @@
 """
-uv run torchrun --nproc_per_node=2 -m src.run.experiment.distill.run
+uv run torchrun --nproc_per_node=2 -m src.run.experiment.distill-diff.run
 """
 
 import json
-import os
 from pathlib import Path
 import torch
 
 from src.run.train.base import BaselineConfig, FilteringConfig
 from src.run.train.distill import DistillConfig
-from src.run.experiment.config import GetStoriesConfig, chinchilla_tokens, stories_model
+from src.model.config import model_config
+from src.run.experiment.config import GetStoriesConfig, trinity_train_config
 from src.run.util.config import EvalConfig, ExperimentConfig, TrainConfig
 from src.run.main import run
 
@@ -17,12 +17,8 @@ torch.cuda.empty_cache()
 
 root_dir = Path("src").absolute()
 
-LR = 1e-4
-BS = 128 # effective batch size in seqs, split over GPUs
-NUM_GPUS = int(os.environ.get("WORLD_SIZE", 1))
-
-M20 = stories_model(embed_dim=448, num_layers=9) # 22.7M params, w2d 49.8
-M5 = stories_model(embed_dim=256, num_layers=5) # 5.6M params, w2d 51.2
+M50 = model_config("50M")
+M25 = model_config("25M")
 
 no_elicit = EvalConfig(elicit=False, num_train_evals=200)
 elicit = EvalConfig(elicit=True, num_train_evals=200)
@@ -35,18 +31,21 @@ def make_config(seed: int, tokens_per_param: int = 20) -> ExperimentConfig:
     metadata = json.load(open(config.data.dirs[0] / "metadata.json"))
 
     # pretraining stages get tokens_per_param tokens per parameter; 20 is Chinchilla-optimal
-    # (~454M tokens for 20M, ~111M for 5M)
-    train_20m = TrainConfig(lr=LR, bs=BS // NUM_GPUS, seed=seed, num_tokens=chinchilla_tokens(M20, tokens_per_param))
-    train_5m = TrainConfig(lr=LR, bs=BS // NUM_GPUS, seed=seed, num_tokens=chinchilla_tokens(M5, tokens_per_param))
+    # (~1.005B tokens for 50M, ~493M for 25M)
+    train_50m = trinity_train_config(M50, seed=seed, tokens_per_param=tokens_per_param)
+    train_25m = trinity_train_config(M25, seed=seed, tokens_per_param=tokens_per_param)
 
-    # the 20M baseline samples uniformly over all train data, so it sees the forget topic's
-    # share of its budget (~9.6M tokens at 20/param); the specialist fine-tunes on that many forget tokens
+    # the 50M baseline samples uniformly over all train data; the specialist
+    # fine-tunes on the forget topic's share of that baseline's token budget
     forget_share = metadata[FORGET]["train"]["total_tokens"] / metadata["all"]["total_tokens_train"]
     specialist = TrainConfig(
-        lr=LR / 4,
-        bs=BS // NUM_GPUS,
+        # Trinity's SFT uses one tenth of the pretraining peak learning rates.
+        lr=train_50m.lr / 10,
+        muon_lr=train_50m.muon_lr / 10,
+        bs=train_50m.bs,
+        acc_steps=train_50m.acc_steps,
         seed=seed,
-        num_tokens=round(train_20m.num_tokens * forget_share),
+        num_tokens=round(train_50m.num_tokens * forget_share),
     )
 
     prefix = f"distill/seed_{seed}"
@@ -55,68 +54,68 @@ def make_config(seed: int, tokens_per_param: int = 20) -> ExperimentConfig:
     config.log_level = "DEBUG"
     config.compile = True
     config.stages = [
-        #20M params
+        #50M params
         BaselineConfig(
-            name="base_20m",
-            model=M20,
-            train=train_20m,
+            name="base_50m",
+            model=M50,
+            train=train_50m,
             eval=no_elicit,
         ),
         FilteringConfig(
-            name="filter_20m",
-            model=M20,
-            train=train_20m,
+            name="filter_50m",
+            model=M50,
+            train=train_50m,
             eval=elicit,
             retain_targets=RETAIN,
         ),
-        #5M params
+        #25M params
         BaselineConfig(
-            name="base_5m",
-            model=M5,
-            train=train_5m,
+            name="base_25m",
+            model=M25,
+            train=train_25m,
             eval=no_elicit,
         ),
         FilteringConfig(
-            name="filter_5m",
-            model=M5,
-            train=train_5m,
+            name="filter_25m",
+            model=M25,
+            train=train_25m,
             eval=elicit,
             retain_targets=RETAIN,
         ),
         DistillConfig(
-            name="distill_all_5m",
-            model=M5,
-            train=train_5m,
+            name="distill_all_25m",
+            model=M25,
+            train=train_25m,
             eval=elicit,
             retain_targets=[["core", FORGET]],
-            teacher="base_20m",
+            teacher="base_50m",
             teacher_type="baseline",
         ),
         DistillConfig(
-            name="distill_base_5m",
-            model=M5,
-            train=train_5m,
+            name="distill_base_25m",
+            model=M25,
+            train=train_25m,
             eval=elicit,
             retain_targets=RETAIN,
-            teacher="base_20m",
+            teacher="base_50m",
             teacher_type="baseline",
         ),
         DistillConfig(
-            name="distill_filter_5m",
-            model=M5,
-            train=train_5m,
+            name="distill_filter_25m",
+            model=M25,
+            train=train_25m,
             eval=elicit,
             retain_targets=RETAIN,
-            teacher="filter_20m",
+            teacher="filter_50m",
             teacher_type="filtering",
         ),
         DistillConfig(
-            name="distill_diff_5m",
-            model=M5,
-            train=train_5m,
+            name="distill_diff_25m",
+            model=M25,
+            train=train_25m,
             eval=elicit,
             retain_targets=RETAIN,
-            teacher="base_20m",
+            teacher="base_50m",
             teacher_type="difference",
             specialist=specialist,
             alpha=1.0,

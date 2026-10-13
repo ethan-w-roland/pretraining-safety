@@ -26,6 +26,7 @@ from src.model.config import Transformer
 from src.model.utils import save_model
 from src.run.eval import eval_loss
 from src.run.train.base import make_scheduler
+from src.run.train.optim import PretrainingOptimizer
 from src.run.util.config import ExperimentConfig, StageConfig, TrainConfig
 from src.run.util.data import make_loader
 from src.run.util.distributed import barrier, get_raw_model, is_main_process
@@ -134,9 +135,10 @@ def do_distill(
     logger.info(f"num_total_steps: {num_total_steps}")
     eval_freq = max(1, round(num_total_steps / num_evals)) if num_evals > 0 else -1
 
-    opt = torch.optim.AdamW(model.parameters(), lr=train.lr, fused=True, betas=train.adam_betas)
-    scheduler = make_scheduler(stage, opt, num_total_steps, logger)
-    cur_lr = scheduler.get_last_lr()[0]
+    opt = PretrainingOptimizer(model, train)
+    schedulers = [make_scheduler(stage, optimizer, num_total_steps, logger) for optimizer in opt.optimizers]
+    cur_lr = schedulers[0].get_last_lr()[0]
+    logger.info(f"Muon + AdamW: peak AdamW lr={train.lr}, peak Muon lr={train.muon_lr}")
 
     losses = {"train": [], "val": {label: [] for label in config.data.labels}} # train: (step, acc_idx, kl)
 
@@ -173,8 +175,9 @@ def do_distill(
             torch.nn.utils.clip_grad_norm_(model.parameters(), 1.0)
             opt.step()
             opt.zero_grad(set_to_none=True)
-            scheduler.step()
-            cur_lr = scheduler.get_last_lr()[0]
+            for scheduler in schedulers:
+                scheduler.step()
+            cur_lr = schedulers[0].get_last_lr()[0]
 
             # student CE on each label's test split
             if eval_freq > 0 and step % eval_freq == 0:

@@ -1,232 +1,107 @@
+"""
+Dense transformer: Qwen3 (Qwen Team, 2025), instantiated from
+``transformers.Qwen3ForCausalLM`` so the trunk is literally the reference
+implementation:
+
+- pre-norm blocks with RMSNorm (``eps=1e-6``), residual ``h = x + attn(norm(x)); out = h + mlp(norm(h))``
+- grouped-query attention with QK-norm (RMSNorm over ``head_dim`` on q and k),
+  no biases, ``head_dim`` decoupled from ``embed_dim / num_heads``, rotary
+  embeddings with ``theta=1e6``
+- SwiGLU feedforward with no biases, hidden width ``~8/3 d`` (``utils.swiglu_dim``)
+- tied token embedding / output projection (as Qwen3-0.6B..4B)
+- plain causal attention over the packed sequence (HF's default mask; EOS is
+  just a token, as in Qwen pretraining where documents are packed with
+  ``<|endoftext|>`` between them)
+
+``BaseTransformer`` wraps the HF model behind the project's
+``forward(tokens, targets) -> (logits, loss)`` interface and computes
+cross-entropy on fp32 logits against the loader's already-shifted targets
+(``-1000`` ignored).
+
+Models are built directly in their training dtype (``dtype``, default bf16)
+rather than cast afterwards: ``model.to(bfloat16)`` would also cast the rotary
+``inv_freq`` buffer, which HF creates in fp32 on purpose, while construction
+through HF's ``from_config(..., dtype=dtype)`` leaves it fp32.
+
+The routed models (``src.model.routed``) build on the same wrapper and swap
+each layer's MLP for a routed one.
+"""
+
 from typing import Tuple, Optional
+
 import torch
-import torch.nn as nn
 import torch.nn.functional as F
+from transformers import AutoModelForCausalLM, Qwen3Config
+
 from src.model.config import ModelConfig, Transformer
 
-class Rotary(nn.Module):
-    def __init__(self, dim: int, max_seq_len: int = 65536) -> None:
-        super().__init__()
 
-        angular_freq = (1 / 1024) ** torch.linspace(0, 1, steps=dim // 4, dtype=torch.float32)
-        angular_freq = torch.cat([angular_freq, angular_freq.new_zeros(dim // 4)])
-        t = torch.arange(max_seq_len, dtype=torch.float32)
-        theta = torch.einsum("i,j -> ij", t, angular_freq)
-        self.register_buffer("cos", theta.cos(), persistent=False)
-        self.register_buffer("sin", theta.sin(), persistent=False)
-
-    def forward(self, x: torch.Tensor) -> torch.Tensor:
-        cos = self.cos[None, : x.size(-3), None, :]
-        sin = self.sin[None, : x.size(-3), None, :]
-        x1, x2 = x.float().chunk(2, dim=-1)
-        y1 = x1 * cos + x2 * sin
-        y2 = x1 * (-sin) + x2 * cos
-        return torch.cat((y1, y2), 3).type_as(x)
-
-
-class Attention(nn.Module):
-    def __init__(
-        self,
-        num_heads: int,
-        embed_dim: int,
-        num_key_value: int,
-        bias: bool,
-    ) -> None:
-    
-        super().__init__()
-
-        assert embed_dim % num_heads == 0
-        assert num_heads % num_key_value == 0
-
-        self.num_heads = num_heads
-        self.embed_dim = embed_dim
-        self.num_key_value = num_key_value
-        self.head_dim = embed_dim // num_heads
-
-        self.rotary = Rotary(embed_dim // num_heads)
-
-        self.c_attn_q = nn.Linear(
-            in_features=embed_dim, 
-            out_features=embed_dim,
-            bias=bias)
-
-        self.c_attn_kv = nn.Linear(
-            in_features=embed_dim, 
-            out_features=2 * num_key_value * self.head_dim,
-            bias=bias)
-
-        self.c_proj = nn.Linear(
-            in_features=embed_dim, 
-            out_features=embed_dim, 
-            bias=bias)
-
-    def forward(self, x: torch.Tensor, attn_mask: torch.Tensor) -> tuple[torch.Tensor, torch.Tensor]:
-
-        B, T, E = x.size()
-
-        q = self.c_attn_q(x)
-        q = q.view(B, T, self.num_heads, self.head_dim)
-
-        k = self.c_attn_kv(x)
-        k, v = k.split(self.num_key_value * self.head_dim, dim=2)
-
-        k = k.view(B, T, self.num_key_value, self.head_dim)
-        v = v.view(B, T, self.num_key_value, self.head_dim)
-        q, k = self.rotary(q), self.rotary(k)  # rotary expects (B, T, H, D)
-
-        q, k, v = q.transpose(1, 2), k.transpose(1, 2), v.transpose(1, 2)
-
-        y = F.scaled_dot_product_attention(q, k, v, attn_mask=attn_mask, enable_gqa=True)
-        y = y.transpose(1, 2).contiguous().view(B, T, E)
-        y = self.c_proj(y)
-
-        return y
+def qwen3_config(config: ModelConfig) -> Qwen3Config:
+    """Map the project ``ModelConfig`` onto a ``Qwen3Config`` (default RoPE, no sliding window, no KV cache)."""
+    head_dim = config.head_dim if config.head_dim is not None else config.embed_dim // config.num_heads
+    return Qwen3Config(
+        vocab_size=config.vocab_size,
+        hidden_size=config.embed_dim,
+        intermediate_size=config.mlp_dim,
+        num_hidden_layers=config.num_layers,
+        num_attention_heads=config.num_heads,
+        num_key_value_heads=config.num_key_value,
+        head_dim=head_dim,
+        hidden_act="silu",
+        max_position_embeddings=config.ctx_len,
+        initializer_range=0.02,
+        rms_norm_eps=config.norm_eps,
+        use_cache=False,
+        tie_word_embeddings=config.tie_embeddings,
+        rope_theta=config.rope_theta,
+        attention_bias=config.attn_bias,
+        use_sliding_window=False,
+        eos_token_id=config.eos_token_id if config.eos_token_id >= 0 else None,
+    )
 
 
-class MLP(nn.Module):
-    def __init__(
-        self,
-        embed_dim: int,
-        mlp_dim: int,
-    ) -> None:
+class QwenTransformer(Transformer):
+    """Project wrapper around a freshly initialised ``Qwen3ForCausalLM`` (``self.hf``), built in ``dtype``."""
 
-        super().__init__()
-
-        self.c_fc = nn.Linear(
-            in_features=embed_dim,
-            out_features=mlp_dim,
-            bias=True)
-            
-        self.c_proj = nn.Linear(
-            in_features=mlp_dim,
-            out_features=embed_dim,
-            bias=True)
-
-    def forward(self, x: torch.Tensor) -> torch.Tensor:
-        h = self.c_fc(x)
-        h = F.gelu(h, approximate="tanh")
-        h = self.c_proj(h)
-        return h
-
-class Block(nn.Module):
-
-    def __init__(
-        self, 
-        embed_dim: int,
-        num_heads: int,
-        num_key_value: int,
-        attn_bias: bool,
-        mlp_dim: int,
-    ) -> None:
-
-        super().__init__()
-
-        self.attn = Attention(
-            embed_dim=embed_dim,
-            num_heads=num_heads,
-            num_key_value=num_key_value,
-            bias=attn_bias,
-        )
-
-        self.mlp = MLP(
-            embed_dim=embed_dim,
-            mlp_dim=mlp_dim,
-        )
-
-        self.norm_1 = nn.RMSNorm(embed_dim)
-        self.norm_2 = nn.RMSNorm(embed_dim)
-
-    def forward(
-        self,
-        x: torch.Tensor,
-        attn_mask: torch.Tensor,
-    ) -> torch.Tensor:
-
-        x = x + self.attn(self.norm_1(x), attn_mask=attn_mask)
-        x = x + self.mlp(self.norm_2(x))
-        return x
-
-
-class BaseTransformer(Transformer):
-    def __init__(
-        self, 
-        config: ModelConfig,
-    ) -> None:
-
+    def __init__(self, config: ModelConfig, dtype: torch.dtype = torch.bfloat16) -> None:
         super().__init__(config)
+        self.dtype = dtype
+        self.hf = AutoModelForCausalLM.from_config(qwen3_config(config), dtype=dtype)
 
-        self.embed = nn.Embedding(config.vocab_size, config.embed_dim)
-        self.norm = nn.RMSNorm(config.embed_dim)
-        self.unembed = nn.Linear(config.embed_dim, config.vocab_size, bias=True)
+    @staticmethod
+    def loss_fn(logits: torch.Tensor, targets: torch.Tensor) -> torch.Tensor:
+        """
+        logits:  (B, T, V) any float dtype
+        targets: (B, T) next-token ids, -1000 = ignored
+        returns: scalar mean CE computed on fp32 logits
+        """
+        return F.cross_entropy(
+            logits.float().view(-1, logits.size(-1)),
+            targets.reshape(-1),
+            ignore_index=-1000,
+            reduction="mean",
+        )
 
-        self.blocks = nn.ModuleList(
-            [Block(
-                embed_dim=config.embed_dim,
-                num_heads=config.num_heads,
-                num_key_value=config.num_key_value,
-                attn_bias=config.attn_bias,
-                mlp_dim=config.mlp_dim,
-            ) for _ in range(config.num_layers)])
 
-        self.apply(self._init_weights)
-
-    def _init_weights(self, module: nn.Module) -> None:
-        if isinstance(module, (nn.Linear, nn.Embedding)):
-            module.weight.data.normal_(mean=0.0, std=0.02)
-            if hasattr(module, "bias") and getattr(module, "bias") is not None:
-                module.bias.data.zero_()
-        elif isinstance(module, nn.RMSNorm):
-            module.weight.data.fill_(1.0)
+class BaseTransformer(QwenTransformer):
 
     def forward(
         self,
         tokens: torch.Tensor,
-        targets: torch.Tensor | None = None,
+        targets: Optional[torch.Tensor] = None,
         stop_at_layer: int | None = None,
     ) -> Tuple[torch.Tensor, Optional[torch.Tensor]]:
-
-        loss = None
-
-        def run_stack(
-            tok: torch.Tensor, # (B, T)
-            stop_at_layer: int | None = None,
-        ) -> torch.Tensor:
-
-            attn_mask = make_attention_mask(tok, self.config.eos_token_id)
-            h = self.embed(tok) # (B, T, E)
-            for i, block in enumerate(self.blocks):
-                h = block(h, attn_mask=attn_mask)
-                if stop_at_layer is not None and i == stop_at_layer:
-                    return h
-            h = self.norm(h)
-            return self.unembed(h)
-        
-        out = run_stack(tokens, stop_at_layer) # (B, T, V)
-
+        """
+        tokens:        (B, T) token ids
+        targets:       (B, T) next-token ids, -1000 = ignored; None for no loss
+        stop_at_layer: return the residual stream (B, T, E) after this block instead of logits
+                       (runs the full stack; block ``i``'s output is HF ``hidden_states[i + 1]``)
+        returns:       (logits (B, T, V) or activations (B, T, E), loss scalar or None)
+        """
         if stop_at_layer is not None:
-            #out is activtion at the stop layer
-            return out, loss
+            out = self.hf.model(input_ids=tokens, output_hidden_states=True)
+            return out.hidden_states[stop_at_layer + 1], None
 
-        if targets is not None:
-            #calculate CE loss
-            loss = F.cross_entropy(
-                out.view(-1, out.size(-1)),
-                targets.reshape(-1),
-                ignore_index=-1000,
-                reduction="mean",
-            )
-       
-        #out is logits
-        return out, loss
-
-
-def make_attention_mask(tokens: torch.Tensor, eos_token_id: int) -> torch.Tensor:
-    """Causal segmentation-aware mask. Shape (B, 1, T, T), False = masked."""
-    seq_len = tokens.shape[1]
-    device = tokens.device
-    eos_mask = tokens == eos_token_id
-    seg_ids = torch.cumsum(eos_mask.int(), dim=1) - eos_mask.int()
-    same_segment = seg_ids.unsqueeze(2).eq(seg_ids.unsqueeze(1))
-    causal = torch.tril(torch.ones((seq_len, seq_len), dtype=torch.bool, device=device))
-    allowed = same_segment & causal
-    return allowed.unsqueeze(1)
+        logits = self.hf(input_ids=tokens).logits # (B, T, V)
+        loss = self.loss_fn(logits, targets) if targets is not None else None
+        return logits, loss
