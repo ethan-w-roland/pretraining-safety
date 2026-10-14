@@ -40,7 +40,7 @@ def make_config(seed: int, tokens_per_param: int = 20) -> ExperimentConfig:
     forget_share = metadata[FORGET]["train"]["total_tokens"] / metadata["all"]["total_tokens_train"]
     specialist = TrainConfig(
         # Trinity's SFT uses one tenth of the pretraining peak learning rates.
-        lr=train_50m.lr / 10,
+        adamw_lr=train_50m.adamw_lr / 10,
         muon_lr=train_50m.muon_lr / 10,
         bs=train_50m.bs,
         acc_steps=train_50m.acc_steps,
