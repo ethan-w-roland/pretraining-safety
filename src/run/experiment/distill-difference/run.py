@@ -42,6 +42,7 @@ def make_config(seed: int, tokens_per_param: int = 20) -> ExperimentConfig:
         # Trinity's SFT uses one tenth of the pretraining peak learning rates.
         adamw_lr=train_50m.adamw_lr / 10,
         muon_lr=train_50m.muon_lr / 10,
+        adamw_betas=train_50m.adamw_betas,
         bs=train_50m.bs,
         acc_steps=train_50m.acc_steps,
         seed=seed,

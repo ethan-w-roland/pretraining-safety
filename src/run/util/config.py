@@ -68,13 +68,14 @@ hf_logging.set_verbosity_error()
 class TrainConfig:
     """Configuration for training."""
     adamw_lr: float = 3e-4 # AdamW LR for embeddings/head/norms; Muon handles hidden matrices
+    adamw_betas: tuple[float, float] = (0.9, 0.95) # presets pick these from the global batch (optim.adamw_betas)
     muon_lr: float = 1e-3 # base LR before Trinity's per-matrix shape adjustment
     muon_momentum: float = 0.95
     muon_ns_steps: int = 5
     weight_decay: float = 0.1
     bs: int = 128
     ctx_len: int = 512
-    acc_steps: int = 1 # effective batch size = bs * acc_steps * num_gpus
+    acc_steps: int = 1 # effective batch size = bs * acc_steps * world size
     warmup_prc: float = 0.1
     warmup_steps: int = 2000 # cap on fractional warmup duration
     decay_prc: float = 0.1

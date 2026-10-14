@@ -21,6 +21,7 @@ from src.run.util.config import (
     TrainConfig,
 )
 from src.model.utils import calc_base_params, swiglu_dim
+from src.run.train.optim import adamw_betas
 from src.model.config import model_config
 
 
@@ -89,8 +90,10 @@ def trinity_train_config(
     Trinity does not give a batch-size scaling law. We anchor the 25M Stories
     preset at 128 global sequences and scale token batch linearly with parameter
     count, rounded to a power of two. Microbatches are capped at 8 sequences per
-    GPU and gradient accumulation fills the global batch. WSD uses <=2000 warmup
-    steps, capped at 10% of the run, and a final 10% linear decay to zero.
+    GPU and gradient accumulation fills the global batch. AdamW betas follow
+    Porian et al. for that global token batch (``optim.adamw_betas``). WSD uses
+    <=2000 warmup steps, capped at 10% of the run, and a final 10% linear decay
+    to zero.
     """
     world_size = int(os.environ.get("WORLD_SIZE", 1)) if world_size is None else world_size
     assert world_size > 0
@@ -107,6 +110,7 @@ def trinity_train_config(
     adam_lr = max(2e-4, 3e-4 * (1024 / model.embed_dim) ** (math.log(1.5) / math.log(2)))
     return TrainConfig(
         adamw_lr=adam_lr,
+        adamw_betas=adamw_betas(global_batch * model.ctx_len),
         muon_lr=1e-3,
         muon_momentum=0.95,
         muon_ns_steps=5,

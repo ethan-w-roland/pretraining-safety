@@ -26,16 +26,22 @@ class PretrainingOptimizerTests(unittest.TestCase):
         with self.assertRaises(ValueError):
             adamw_betas(0)
 
-    def test_optimizer_betas_include_accumulation_and_ranks(self):
+    def test_optimizer_uses_configured_betas(self):
         cfg = RoutedModelConfig.from_base(ModelConfig(
             vocab_size=32, embed_dim=16, num_layers=1, num_heads=2,
             num_key_value=1, head_dim=8, mlp_dim=128, ctx_len=8,
         ), arch="moe", core_param_prc=.5, aux_param_prc=.5)
         model = MoETransformer(cfg, ["core", "aux"], dtype=torch.float32)
-        for ranks, accumulation, beta2 in ((1, 16, .99), (2, 16, .95), (1, 32, .95)):
-            with patch("src.run.train.optim.get_world_size", return_value=ranks):
-                optimizer = PretrainingOptimizer(model, TrainConfig(bs=16, acc_steps=accumulation, ctx_len=1024))
-            self.assertEqual(optimizer.optimizers[1].param_groups[0]["betas"], (.9, beta2))
+        for betas in ((.9, .99), (.9, .95)):
+            optimizer = PretrainingOptimizer(model, TrainConfig(adamw_betas=betas))
+            self.assertEqual(optimizer.optimizers[1].param_groups[0]["betas"], betas)
+
+    def test_preset_betas_follow_global_token_batch(self):
+        # The global batch is fixed per preset, so world size only changes how it is split.
+        for world_size in (1, 2, 8):
+            self.assertEqual(trinity_train_config(model_config("25M"), world_size=world_size).adamw_betas, (.9, .99))
+        # 0.6B at ctx 4096 has a global batch past Porian's 256 x 2048-token cutoff.
+        self.assertEqual(trinity_train_config(model_config("0.6B"), world_size=8).adamw_betas, (.9, .95))
 
     def test_preset_scaling(self):
         for size, batch, lr in (("25M", 128, 6.75e-4), ("50M", 256, None), ("100M", 512, 4.5e-4)):
@@ -45,7 +51,7 @@ class PretrainingOptimizerTests(unittest.TestCase):
             self.assertEqual(train.muon_lr, 1e-3)
             self.assertEqual(train.warmup_steps, 2000)
             self.assertEqual(train.min_lr_ratio, 0.0)
-            self.assertEqual(adamw_betas(train.bs * train.acc_steps * 2 * train.ctx_len), (.9, .99))
+            self.assertEqual(train.adamw_betas, (.9, .99))
             if lr is not None:
                 self.assertAlmostEqual(train.adamw_lr, lr)
 

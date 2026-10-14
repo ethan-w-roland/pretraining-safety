@@ -11,7 +11,7 @@ import torch
 
 from src.model.routed import RoutedTransformer
 from src.run.util.config import TrainConfig
-from src.run.util.distributed import get_raw_model, get_world_size, is_distributed
+from src.run.util.distributed import get_raw_model, is_distributed
 
 
 def adamw_betas(batch_tokens: int) -> tuple[float, float]:
@@ -101,7 +101,7 @@ class PretrainingOptimizer:
         if adam_groups:
             self.optimizers.append(torch.optim.AdamW(
                 adam_groups, lr=train.adamw_lr,
-                betas=adamw_betas(train.bs * train.acc_steps * get_world_size() * train.ctx_len),
+                betas=train.adamw_betas,
                 eps=1e-8,
                 fused=next(raw.parameters()).is_cuda,
             ))
