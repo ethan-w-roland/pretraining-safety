@@ -30,12 +30,10 @@ from src.run.util.data import make_datasets
 from src.run.util.tools import get_timestamp, set_seeds, json_safe
 from src.run.util.logger import setup_logger
 from src.run.util.distributed import (
-    get_rank,
     get_world_size,
     is_main_process,
     barrier,
     broadcast_object,
-    is_distributed,
     setup_distributed,
 )
 
@@ -69,7 +67,7 @@ hf_logging.set_verbosity_error()
 @dataclass
 class TrainConfig:
     """Configuration for training."""
-    lr: float = 3e-4 # AdamW LR for embeddings/head/norms; Muon handles hidden matrices
+    adamw_lr: float = 3e-4 # AdamW LR for embeddings/head/norms; Muon handles hidden matrices
     muon_lr: float = 1e-3 # base LR before Trinity's per-matrix shape adjustment
     muon_momentum: float = 0.95
     muon_ns_steps: int = 5
@@ -82,7 +80,6 @@ class TrainConfig:
     decay_prc: float = 0.1
     min_lr_ratio: float = 0.0
     epochs: int = 1
-    adam_betas: tuple[float, float] = (0.9, 0.95)
     seed: int = 42
     num_tokens: int = -1 #total tokens to train over, -1 for all data
 
@@ -105,11 +102,13 @@ class StageConfig:
 
 @dataclass
 class DataConfig:
-    """Configuration for data limits."""
+    """Which shard directories to read and how their labels split into core / aux."""
     dirs: list[Path] = field(default_factory=list)
     core: list[str] = field(default_factory=list)
     aux: list[str] = field(default_factory=list)
-    datasets: dict = field(default_factory=dict) # label -> split -> shards
+    # set by setup()
+    datasets: dict = field(init=False, default_factory=dict) # label -> split -> shards
+    tokenizer: AutoTokenizer | None = field(init=False, default=None)
     @property
     def labels(self) -> list[str]:
         return ["core"] + sorted(self.aux)
@@ -121,14 +120,12 @@ class ExperimentConfig:
     data: DataConfig = field(default_factory=DataConfig)
     compile: bool = True
     find_unused_parameters: bool = False
-    is_ddp: bool = False
     log_level: str = "INFO"
-    num_gpus: int = 1
-    process_id: int = -1
-    device: torch.device = torch.device("cuda")
-    logger: logging.Logger = field(default_factory=logging.getLogger)
     res_root: Path = field(default_factory=Path)
     experiment_id: str = field(default_factory=get_timestamp)
+    # set by setup()
+    device: torch.device = field(init=False, default=torch.device("cuda"))
+    logger: logging.Logger = field(init=False, default_factory=logging.getLogger)
     @property
     def res_dir(self) -> Path:
         return self.res_root / self.experiment_id
@@ -227,9 +224,7 @@ def setup(config: ExperimentConfig) -> ExperimentConfig:
     torch.backends.cudnn.allow_tf32 = True
     torch.backends.cuda.enable_cudnn_sdp(False)
     torch.set_float32_matmul_precision("high")
-    device = torch.device("cuda")
-    config.device = device
-    config.is_ddp = is_distributed()
+    config.device = torch.device("cuda")
 
     # Only create directory on main process to avoid duplicates in ddp
     if is_main_process():
@@ -241,42 +236,35 @@ def setup(config: ExperimentConfig) -> ExperimentConfig:
         stage.res_dir = config.res_dir / stage.name
 
     # Setup logger
-    config.process_id = get_rank()
     log_file = config.res_dir / "training.log"
     logger = setup_logger(
         name=f"training_{config.experiment_id}",
         log_file=log_file,
         level=config.log_level,
-        process_id=config.process_id,
     )
     config.logger = logger
 
     branch, commit = get_git_info()
     logger.info(f"Git branch: {branch}, commit: {commit}")
-
-    # Get number of GPUs
-    config.num_gpus = get_world_size()
-    logger.info(f"Number of GPUs: {config.num_gpus}")
+    logger.info(f"Number of GPUs: {get_world_size()}")
 
     # Setup tokenizer
     dataset_metadata_path = config.data.dirs[0] / "metadata.json"
     tokenizer = setup_tokenizer(dataset_metadata_path, logger)
+    config.data.tokenizer = tokenizer
 
-    # Round vocab size to nearest multiple of 64
-    vocab_size = 64 * ((len(tokenizer) + 63) // 64)
-    logger.info(f"Set model vocab size to nearest multiple of 64 of tokenizer size: {vocab_size}")
-
-    # Update model config for each stage
+    # Each stage's model must be sized for the dataset's tokenizer
     for stage in config.stages:
-        assert isinstance(stage.model, ModelConfig), f"Stage {stage.res_dir.name} must declare a model config"
+        assert isinstance(stage.model, ModelConfig), f"Stage {stage.name} must declare a model config"
         if stage.model.tokenizer_name is not None:
             assert stage.model.tokenizer_name == tokenizer.name_or_path, (
-                f"Stage {stage.res_dir.name} model is sized for tokenizer {stage.model.tokenizer_name!r} "
+                f"Stage {stage.name} model is sized for tokenizer {stage.model.tokenizer_name!r} "
                 f"but the dataset uses {tokenizer.name_or_path!r}"
             )
-        stage.model.tokenizer = tokenizer
-        stage.model.vocab_size = vocab_size
-  
+        assert stage.model.vocab_size >= len(tokenizer), (
+            f"Stage {stage.name} model vocab_size {stage.model.vocab_size} < tokenizer size {len(tokenizer)}"
+        )
+
     # Load datasets
     config.data.datasets = make_datasets(config.data.dirs, config.data.core)
 

@@ -6,9 +6,10 @@ from typing import Any, Iterable, Optional
 from tqdm import tqdm
 
 from src.run.util.config import ExperimentConfig, StageConfig
-from src.model.config import ROUTED_ARCHS, Transformer
+from src.model.config import Transformer
+from src.model.utils import expert_kwargs
 from src.run.util.data import make_loader
-from src.run.util.tools import log_line, get_exp_mask, json_safe
+from src.run.util.tools import log_line, json_safe
 from src.run.util.logger import get_tqdm_kwargs
 from src.run.util.distributed import get_raw_model, is_main_process, barrier, reduce_tensor
 
@@ -34,15 +35,11 @@ def eval_loss(
 
     # unpack config
     logger = config.logger
-    labels = config.data.labels
     device = config.device
 
     loader = make_loader(config, stage, [data_label], split)
     loader.reset(shuffle_seed)
-
-    # Get raw model for accessing config
-    raw_model = get_raw_model(model)
-    is_routed = raw_model.config.arch in ROUTED_ARCHS
+    experts = expert_kwargs(model, expert_labels)
 
     total_loss = 0.0
     max_batches = len(loader)
@@ -59,33 +56,7 @@ def eval_loss(
     model.eval()
 
     for _, x, y in itertools.islice(loader, num_batches):
-
-        if is_routed:
-
-            fwd_mask = get_exp_mask(
-                labels=labels,
-                selected_labels=expert_labels,
-                device=device,
-            )
-            bck_mask = get_exp_mask(
-                labels=labels,
-                selected_labels=expert_labels,
-                device=device,
-            )
-            loss = model(
-                tokens=x,
-                targets=y,
-                fwd_mask=fwd_mask,
-                bck_mask=bck_mask,
-            )[1]
-            
-        else:
-
-            loss = model(
-                tokens=x,
-                targets=y,
-            )[1]
-
+        loss = model(tokens=x, targets=y, **experts)[1]
         total_loss += loss.item()
 
     model.train(was_training)
@@ -141,8 +112,8 @@ def generate_samples(
     device = config.device
     logger = config.logger
 
-    # Get raw model for accessing config and model_type
     raw_model = get_raw_model(model)
+    experts = expert_kwargs(model, expert_labels)
 
     def _generate_batch(batch_prompts: list[list[int]]) -> list[list[int]]:
         if not batch_prompts:
@@ -165,22 +136,8 @@ def generate_samples(
         max_new_tokens = raw_model.config.ctx_len - max_prompt_len
 
         for _ in tqdm(range(max_new_tokens), **get_tqdm_kwargs(logger, desc=f"Generating samples | Data: {data_label}", ncols=100)):
-            if raw_model.config.arch in ROUTED_ARCHS:
-                labels = config.data.labels
-
-                fwd_mask = get_exp_mask(labels, expert_labels, device=prompt_batch.device)
-                bck_mask = get_exp_mask(labels, expert_labels, device=prompt_batch.device)
-
-                logp = model(
-                    tokens=prompt_batch,
-                    targets=None,
-                    fwd_mask=fwd_mask,
-                    bck_mask=bck_mask,
-                )[0]
-                next_tok = torch.argmax(logp[:, -1, :], dim=-1)
-            else:
-                logits = model(prompt_batch)[0]
-                next_tok = torch.argmax(logits[:, -1, :], dim=-1)
+            logits = model(tokens=prompt_batch, **experts)[0]
+            next_tok = torch.argmax(logits[:, -1, :], dim=-1)
 
             prompt_batch = torch.cat([prompt_batch, next_tok.unsqueeze(1)], dim=1)
 
@@ -213,7 +170,7 @@ def generate_samples(
         generations_tok.extend(_generate_batch(batch_prompts))
 
     # 3. Decode and save
-    tok = raw_model.config.tokenizer
+    tok = config.data.tokenizer
     sequences_text = [tok.decode(s, skip_special_tokens=False) for s in sequences_tok]
     prompts_text = [tok.decode(p, skip_special_tokens=False) for p in prompts_tok]
     continuations_text = [tok.decode(g, skip_special_tokens=False) for g in generations_tok]

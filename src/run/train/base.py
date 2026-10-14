@@ -1,19 +1,18 @@
 """
-Standard training loop.
+The training loop shared by every stage, and the dense training stage.
 
-This is the simplest training loop in the pipeline — a single optimizer over
-all model parameters, no expert routing, no per-label gradient control.  Used
-for baseline pretraining and the data-filtering stage (retrain from scratch
-on a subset of labels).
+``train_loop`` is the one optimizer loop in the pipeline: Muon + AdamW
+(``PretrainingOptimizer``), warmup / constant / linear-decay LR, gradient
+accumulation, periodic validation, then a final checkpoint and loss pickle
+(train loss and per-label val loss histories, for offline analysis).
+Stages differ only in the micro-batch loss they pass:
 
-Key design points:
+- ``do_train`` (baseline and data-filtering stages): next-token CE.
+- ``do_routing`` (``src.run.train.routing``): CE with per-sequence expert masks.
+- ``do_distill`` (``src.run.train.distill``): KL to a frozen teacher.
 
-- **Muon + AdamW** for Trinity-style pretraining.
-  Warmup, constant LR, then linear decay; durations are stage-configurable.
-- **Loss pickle dumps**: the train loss and per-label val loss histories are
-  saved alongside checkpoints for offline analysis and plotting.
-- **Mixed batches**: one loader over all train labels, so every micro-batch
-  mixes sequences from all labels in proportion to their budgets.
+One loader covers all train labels, so every micro-batch mixes sequences from
+all labels in proportion to their budgets.
 """
 
 import contextlib
@@ -22,21 +21,23 @@ import torch
 import logging
 
 from dataclasses import dataclass
-from typing import Iterable
+from typing import Callable, Iterable
 from tqdm.auto import tqdm
 from torch.optim.lr_scheduler import LambdaLR
 
-from src.model.base import BaseTransformer
+from src.model.config import Transformer
 from src.run.util.config import ExperimentConfig, StageConfig
 from src.run.util.data import make_loader
 from src.run.util.tools import set_seeds, save_losses
 from src.run.util.logger import get_tqdm_kwargs
-from src.run.util.distributed import barrier
+from src.run.util.distributed import barrier, is_distributed
 from src.model.utils import save_model
 from src.run.eval import eval_loss
 from src.run.train.optim import PretrainingOptimizer
-from src.run.train.routing import routing_masks
-from src.run.util.distributed import get_raw_model
+
+# (labels (B,), x (B, T), y (B, T)) -> scalar loss of one micro-batch, where
+# labels are each sequence's index in config.data.labels
+LossFn = Callable[[torch.Tensor, torch.Tensor, torch.Tensor], torch.Tensor]
 
 
 @dataclass
@@ -103,15 +104,17 @@ def make_scheduler(
     return LambdaLR(opt, lr_lambda)
 
 
-def do_train(
+def train_loop(
     stage: StageConfig,
-    model: BaseTransformer,
+    model: Transformer,
     config: ExperimentConfig,
     train_labels: Iterable[str],
+    loss_fn: LossFn,
     eval_expert_configs: list[list[str]] | None = None,
-) -> BaseTransformer:
+    loss_name: str = "CE",
+) -> Transformer:
     """
-    Train a transformer model on specified train data labels, then save the
+    Train ``model`` on ``train_labels`` by minimising ``loss_fn``, then save the
     final checkpoint and loss histories to ``stage.res_dir``.
 
     Args:
@@ -119,142 +122,124 @@ def do_train(
         model: Model to train
         config: Run configuration
         train_labels: Data labels to train on
-        eval_expert_configs: Optional expert subsets to validate separately.
-    
+        loss_fn: Loss of one micro-batch (see ``LossFn``)
+        eval_expert_configs: Expert subsets to validate separately (routed
+            models); None validates the whole model.
+        loss_name: Name of the train loss in logs
+
     Returns:
         Trained model
     """
 
-    # unpack experiment config
+    # unpack config
     logger = config.logger
-    is_ddp = config.is_ddp
-
-    #unpack stage config
-    lr = stage.train.lr
-    acc_steps = stage.train.acc_steps
-    epochs = stage.train.epochs
-    seed = stage.train.seed
+    train = stage.train
+    acc_steps = train.acc_steps
     num_evals = stage.eval.num_train_evals
-    res_dir = stage.res_dir
+    train_labels = list(train_labels)
 
     logger.info(f"---- Begin Train | Train Labels: {train_labels} ----")
 
     model.train()
-    set_seeds(seed)
+    set_seeds(train.seed)
 
     loader = make_loader(config, stage, labels=train_labels, split="train")
 
     # calculate total steps
-    num_batches = len(loader)
-    num_total_steps = (num_batches // acc_steps) * epochs
+    num_total_steps = (len(loader) // acc_steps) * train.epochs
     logger.info(f"num_total_steps: {num_total_steps}")
     eval_freq = max(1, round(num_total_steps / num_evals)) if num_evals > 0 else -1
 
-    # setup optimizer
-    opt = PretrainingOptimizer(model, stage.train)
-    optimizers = opt.optimizers
+    # setup optimizer and scheduler
+    opt = PretrainingOptimizer(model, train)
+    schedulers = [make_scheduler(stage, x, num_total_steps, logger) for x in opt.optimizers]
+    cur_lr = schedulers[0].get_last_lr()[0]
+    logger.info(f"Muon + AdamW: peak AdamW lr={train.adamw_lr}, peak Muon lr={train.muon_lr}")
 
     # setup losses
-    losses = {"train": [], "val": {}} # train: (step, acc_idx, loss)
-    val_targets = []
+    losses = {"train": [], "val": {}} # train: (step, acc_idx, loss); val: key -> (step, loss)
+    val_targets = [] # (data label, expert labels, val key)
     for experts in eval_expert_configs or [None]:
         for label in config.data.labels:
             key = label if experts is None else f"{label}|experts={'+'.join(experts)}"
-            losses["val"][key] = [] # (step, loss)
+            losses["val"][key] = []
             val_targets.append((label, experts, key))
 
-    # setup scheduler
-    schedulers = [make_scheduler(stage, optimizer, num_total_steps, logger) for optimizer in optimizers]
-    cur_lr = schedulers[0].get_last_lr()[0]
-    raw_model = get_raw_model(model)
-    routed:bool = hasattr(raw_model, "labels")
-    active_experts = torch.zeros(len(raw_model.labels), dtype=torch.int32, device=config.device) if routed else None
-    logger.info(f"Muon + AdamW: peak AdamW lr={lr}, peak Muon lr={stage.train.muon_lr}")
-
-    # setup progress bar
-    pbar = tqdm(total = num_total_steps, **get_tqdm_kwargs(logger, ncols=150))
+    pbar = tqdm(total=num_total_steps, **get_tqdm_kwargs(logger, ncols=150))
 
     # training loop
     step = 0
-    for epoch_idx in range(epochs):
+    for epoch_idx in range(train.epochs):
 
         loader.reset(epoch_idx)
 
-        for batch_idx, batch in enumerate(loader):
+        for batch_idx, (labels, x, y) in enumerate(loader):
 
-            labels, x, y = batch
-            if active_experts is not None:
-                active_experts[labels.unique()] = 1
             acc_idx = batch_idx % acc_steps
             is_last_acc = acc_idx == acc_steps - 1
-            kwargs = routing_masks(labels, len(raw_model.labels)) if routed else {}
-            no_sync_ctx = model.no_sync() if (is_ddp and not is_last_acc) else contextlib.nullcontext()
+            no_sync_ctx = model.no_sync() if (is_distributed() and not is_last_acc) else contextlib.nullcontext()
             with no_sync_ctx:
-                _, loss = model(tokens=x, targets=y, **kwargs)
+                loss = loss_fn(labels, x, y)
                 (loss / acc_steps).backward()
+            opt.observe(labels)
+
             cur_loss = loss.item()
-
-            # train loss logging
             losses["train"].append((step, acc_idx, cur_loss))
+            pbar.set_description(f"AC {acc_idx + 1}/{acc_steps} | LR: {cur_lr:.2e} | {loss_name}: {cur_loss:.3f}")
 
-            # update progress bar
-            desc_str = f"AC {acc_idx + 1}/{acc_steps} | LR: {cur_lr:.2e} | L: {cur_loss:.2f}"
-            pbar.set_description(desc_str)
-            pbar.refresh()
+            if not is_last_acc:
+                continue
 
-            if is_last_acc:
+            step += 1
+            pbar.update()
 
-                step += 1
-                pbar.update()
+            # step the optimizer and learning rate
+            torch.nn.utils.clip_grad_norm_(model.parameters(), 1.0)
+            opt.step()
+            opt.zero_grad(set_to_none=True)
+            for scheduler in schedulers:
+                scheduler.step()
+            cur_lr = schedulers[0].get_last_lr()[0]
 
-                # step the optimizer
-                torch.nn.utils.clip_grad_norm_(model.parameters(), 1.0)
-                if active_experts is not None and is_ddp:
-                    torch.distributed.all_reduce(active_experts, op=torch.distributed.ReduceOp.MAX)
-                opt.step(active_experts)
-                if active_experts is not None:
-                    active_experts.zero_()
-                opt.zero_grad(set_to_none=True)
+            # measure validation loss (CE on each label's test split)
+            if eval_freq > 0 and step % eval_freq == 0:
+                for label, experts, key in val_targets:
+                    val_loss = eval_loss(
+                        model, config, stage,
+                        data_label=label,
+                        expert_labels=experts,
+                        num_batches=50,
+                        shuffle_seed=step,
+                    )
+                    losses["val"][key].append((step, val_loss))
 
-                # update learning rate
-                for scheduler in schedulers:
-                    scheduler.step()
-                cur_lr = schedulers[0].get_last_lr()[0]
-
-                # measure validation loss
-                if eval_freq > 0 and step % eval_freq == 0:
-                    for label, experts, key in val_targets:
-                        val_loss = eval_loss(
-                            model, config, stage,
-                            data_label=label, 
-                            expert_labels=experts,
-                            num_batches=50, 
-                            shuffle_seed=step)
-                        losses["val"][key].append((step, val_loss))
-
-                # logger printout
-                if (step == 1) or (step % 1000 == 0) or (step == num_total_steps):
-
-                    logger.info(f"Step: {step}, LR: {cur_lr:.2e}")
-
-                    avg_train_loss = np.mean([x[-1] for x in losses["train"][-10 * acc_steps:]])
-                    logger.info(f"Train Loss: {avg_train_loss:.2f}")
-
-                    if eval_freq > 0:
-                        val_loss_str = ""
-                        for label in losses["val"].keys():
-                            label_str = label.upper()
-                            val_loss = losses["val"][label][-1][1] if len(losses["val"][label]) > 0 else float('nan')
-                            val_loss_str += f"{label_str}: {val_loss:.2f} "
-                        logger.info(f"Val Loss: {val_loss_str}")
+            if (step == 1) or (step % 1000 == 0) or (step == num_total_steps):
+                avg_loss = np.mean([entry[-1] for entry in losses["train"][-10 * acc_steps:]])
+                val_str = " ".join(
+                    f"{key.upper()}: {vals[-1][1]:.2f}" for key, vals in losses["val"].items() if vals
+                )
+                logger.info(f"Step: {step}, LR: {cur_lr:.2e}, Train {loss_name}: {avg_loss:.3f}, Val CE: {val_str}")
 
         # sync after epoch
         barrier()
 
-    # close progress bar
     pbar.close()
 
-    save_model(res_dir, model)
-    save_losses(res_dir, losses)
+    save_model(stage.res_dir, model)
+    save_losses(stage.res_dir, losses)
 
     return model
+
+
+def do_train(
+    stage: StageConfig,
+    model: Transformer,
+    config: ExperimentConfig,
+    train_labels: Iterable[str],
+) -> Transformer:
+    """Train a dense model with next-token cross-entropy on ``train_labels``."""
+
+    def loss_fn(labels, x, y):
+        return model(tokens=x, targets=y)[1]
+
+    return train_loop(stage, model, config, train_labels, loss_fn)

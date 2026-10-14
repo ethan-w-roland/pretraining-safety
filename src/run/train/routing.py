@@ -7,6 +7,7 @@ import torch.nn.functional as F
 
 from src.model.config import RoutedModelConfig
 from src.model.routed import RoutedTransformer
+from src.run.train.base import train_loop
 from src.run.util.config import ExperimentConfig, StageConfig
 
 
@@ -42,13 +43,18 @@ def do_routing(
     model: RoutedTransformer,
     config: ExperimentConfig,
 ) -> RoutedTransformer:
-    """Train each mixed loader batch in one forward with per-sequence masks."""
-    from src.run.train.base import do_train
-    return do_train(
-        stage=stage,
-        model=model,
-        config=config,
+    """Train on all labels, each mixed batch in one forward with per-sequence
+    masks from ``routing_masks``; validate the core expert alone as well."""
+
+    num_experts = len(config.data.labels)
+
+    def loss_fn(labels, x, y):
+        return model(tokens=x, targets=y, **routing_masks(labels, num_experts))[1]
+
+    return train_loop(
+        stage, model, config,
         train_labels=config.data.labels,
+        loss_fn=loss_fn,
         eval_expert_configs=[["core"]],
     )
 

@@ -1,13 +1,14 @@
 """
 export OMP_NUM_THREADS=16 && torchrun --nproc_per_node=8 -m src.run.main
 
-main.py — multiclass-gradient-routing pipeline.
+main.py — multi-stage pretraining pipeline.
 
 Architecture
 ------------
 The pipeline runs a sequence of *stages*, each producing checkpoints in its
-own subdirectory under the results root.  Stages are defined as plain dicts
-in a ``stages`` list (see the CLI block at the bottom for examples).
+own subdirectory under the results root. Stages are typed configs
+(``BaselineConfig``, ``FilteringConfig``, ``DistillConfig``, ``RoutingConfig``)
+listed in ``ExperimentConfig.stages``; see ``src/run/experiment/*/run.py``.
 
 Execution flow::
 
@@ -16,25 +17,25 @@ Execution flow::
           -> run_baseline   # train from scratch on all data
           -> run_filtering  # retrain without target data (per target group)
           -> run_distill    # KL-distill a fresh student from a frozen teacher on retained data
+          -> run_routing    # train a gradient-routed model on all data
 
-Each stage runner is self-contained: it creates the model and delegates
-training to the appropriate ``do_*`` function, which writes the final
-``checkpoint.pth``. Every run trains all of its stages from scratch into a
-fresh results directory; later stages may load earlier stages' checkpoints.
+Each stage runner is self-contained: it creates the model, trains it with the
+appropriate ``do_*`` function (which writes the final ``checkpoint.pth``), then
+evaluates it with ``do_eval``. Every run trains all of its stages from scratch
+into a fresh results directory; later stages may load earlier stages'
+checkpoints.
 
 Adversarial fine-tuning
 -----------------------
-Several stages optionally run "adversarial fine-tuning" (``ft_forget=True``):
-after the main training, the model is fine-tuned on each forget-target label
-individually and evaluated to measure how easily the model can re-learn the
-information.  This is an *elicitation* metric.
+Stages with ``eval.elicit=True`` run "adversarial fine-tuning" after the main
+training: the model is fine-tuned on each forget-target label individually and
+evaluated to measure how easily the model can re-learn the information. This
+is an *elicitation* metric.
 """
 
 import dataclasses
 import gc
 import json
-from pathlib import Path
-from typing import Callable, Optional
 import warnings
 import torch
 
@@ -43,7 +44,7 @@ from src.model.moe import MoETransformer
 from src.model.config import Transformer
 from src.model.utils import copy_model, load_model, make_model
 from src.run.eval import do_eval
-from src.run.util.tools import json_safe, labels_to_str
+from src.run.util.tools import json_safe, labels_to_str, set_seeds
 from src.run.util.config import ExperimentConfig, StageConfig, setup
 from src.run.util.distributed import barrier, get_raw_model
 
@@ -51,53 +52,7 @@ from src.run.train.base import BaselineConfig, FilteringConfig, do_train
 from src.run.train.elicit import do_elicit
 from src.run.train.distill import DistillConfig, do_distill
 from src.run.train.routing import RoutingConfig, do_routing, expert_configurations
-from src.run.util.tools import set_seeds
 warnings.filterwarnings("ignore", message=r"(?s).*Online softmax is disabled.*", category=UserWarning)
-
-def run_experiment(
-    stage: StageConfig,
-    model: Transformer,
-    config: ExperimentConfig,
-    func: Callable,
-    func_args: Optional[dict] = None,
-    eval_configs: Optional[list[dict]] = None,
-) -> Transformer:
-    """
-    Modify a model in some way, then evaluate the effects of the modification.
-
-    Args:
-        stage: Typed stage configuration.
-        model: Model to train (may be DDP-wrapped).
-        config: Run-level configuration (loaders, device, logger, etc.).
-        func: Training function (e.g. do_train, do_distill).
-        func_args: Extra kwargs forwarded to *func*.
-        eval_configs: List of eval kwarg dicts.  Each dict is unpacked into
-            do_eval as a separate call.  Defaults to a single empty-dict call.
-
-    Returns:
-        The model after training.
-    """
-    if func_args is None:
-        func_args = dict()
-    if eval_configs is None:
-        eval_configs = [{}]
-
-    model = func(
-        stage=stage,
-        model=model,
-        config=config,
-        **func_args,
-    )
-
-    for ec in eval_configs:
-        do_eval(
-            stage=stage,
-            model=model,
-            config=config,
-            **ec,
-        )
-
-    return model
 
 
 # ---------------------------------------------------------------------------
@@ -105,297 +60,190 @@ def run_experiment(
 # ---------------------------------------------------------------------------
 
 
-def run_elicitation(
-    stage: StageConfig,
-    cur_dir: Path | None,
-    model: Transformer,
-    config: ExperimentConfig,
-    data_labels: set[str] | list[str],
-    expert_labels: list[str] | None = None,
-    log_extra: dict | None = None,
-) -> None:
-    """Elicitation: copy model per label, finetune, eval, cleanup."""
-
-    model = get_raw_model(model).to("cpu")
+def free_memory() -> None:
+    gc.collect()
     torch.cuda.empty_cache()
 
-    save_dir = cur_dir / "elicit"
-    save_dir.mkdir(parents=True, exist_ok=True)
+
+def eval_log(retained: list[str]) -> dict:
+    """Extra ``stats.jsonl`` fields for a model's post-training eval."""
+    return {"retained": retained, "finetune": None, "elicited": False}
+
+
+def get_retain_targets(stage: FilteringConfig | DistillConfig, config: ExperimentConfig) -> list[list[str]]:
+    """The stage's retain targets; by default core alone, then core plus each aux label."""
+    if stage.retain_targets is not None:
+        return stage.retain_targets
+    aux = config.data.aux
+    if len(aux) == 1:
+        return [["core"]]
+    return [["core"]] + [["core", x] for x in aux]
+
+
+def run_elicitation(
+    stage: StageConfig,
+    model: Transformer,
+    config: ExperimentConfig,
+    data_labels: list[str],
+    retained: list[str],
+    expert_labels: list[str] | None = None,
+) -> None:
+    """For each label, fine-tune a fresh copy of ``model`` on it and log the
+    best loss reached (see ``do_elicit``)."""
+
+    config.logger.info(f"{stage.name} - ADVERSARIAL FT START")
+
+    # keep the original off the GPU while its copies train
+    model = get_raw_model(model).to("cpu")
+    free_memory()
 
     for label in sorted(data_labels):
-
         ft_model = copy_model(model, config)
-
-        log_args = {"finetune": label, "elicited": True}
-        if log_extra:
-            log_args.update(log_extra)
-
         do_elicit(
             stage=stage,
             model=ft_model,
             config=config,
             data_labels=[label],
             expert_labels=expert_labels,
-            log_args=log_args,
+            log_args={"finetune": label, "elicited": True, "retained": retained},
         )
-
         del ft_model
-        torch.cuda.empty_cache()
-
-    del model
-    torch.cuda.empty_cache()
-
-    return None
+        free_memory()
 
 
-def get_retain_targets(aux_labels: list[str]) -> list[list[str]]:
-    """Get the list of retain targets for the auxiliary labels."""
-    if len(aux_labels) == 1:
-        return [["core"]]
-    else:
-        return [["core"]] + [["core", x] for x in aux_labels]
-    
+def load_teachers(
+    stage: DistillConfig,
+    iter_stage: DistillConfig,
+    config: ExperimentConfig,
+    removed: list[str],
+) -> tuple[Transformer, Transformer | None]:
+    """Frozen ``(teacher, anti_teacher)`` for one retain target of a distill stage.
+
+    ``baseline``: the teacher stage's model. ``filtering``: the teacher stage's
+    model for the same retain target. ``difference``: the teacher stage's model,
+    with an anti-teacher fine-tuned from it on the ``removed`` labels.
+    """
+
+    teacher_dir = config.res_dir / stage.teacher
+
+    if stage.teacher_type == "baseline":
+        return load_model(teacher_dir, config, frozen=True), None
+
+    if stage.teacher_type == "filtering":
+        return load_model(teacher_dir / iter_stage.res_dir.name, config, frozen=True), None
+
+    if stage.teacher_type == "difference":
+        config.logger.info(f"Distill: fine-tuning specialist on {removed}")
+        spec_stage = dataclasses.replace(
+            stage,
+            train=stage.specialist,
+            eval=dataclasses.replace(stage.eval, num_train_evals=0),
+            res_dir=iter_stage.res_dir / "specialist",
+        )
+        specialist = load_model(teacher_dir, config)
+        do_train(spec_stage, specialist, config, train_labels=removed)
+        del specialist
+        free_memory()
+        return load_model(teacher_dir, config, frozen=True), load_model(spec_stage.res_dir, config, frozen=True)
+
+    raise ValueError(f"Unknown teacher_type: {stage.teacher_type}")
+
 
 # ---------------------------------------------------------------------------
 # Stage runners
 # ---------------------------------------------------------------------------
 
-def run_baseline(
-    stage: BaselineConfig,
-    config: ExperimentConfig
-) -> Transformer:
-    """Train the baseline model. Returns the model on CPU."""
+def run_baseline(stage: BaselineConfig, config: ExperimentConfig) -> None:
+    """Train from scratch on all data."""
 
-    logger = config.logger
-    labels = config.data.labels
-
-    logger.info("BASELINE START")
+    labels = sorted(config.data.labels)
 
     set_seeds(stage.train.seed)
     model = make_model(BaseTransformer, stage.model, config)
-
-    model = run_experiment(
-        stage=stage,
-        model=model,
-        config=config,
-        func=do_train,
-        func_args={"train_labels": sorted(labels)},
-        eval_configs=[{"log": {
-            "retained": sorted(labels),
-            "finetune": None,
-            "elicited": False,
-        }}],
-    )
+    model = do_train(stage, model, config, train_labels=labels)
+    do_eval(stage, model, config, log=eval_log(labels))
 
     if stage.eval.elicit:
-
-        logger.info("BASELINE - ADVERSARIAL FT START")
-        run_elicitation(
-            stage=stage,
-            cur_dir=stage.res_dir,
-            model=model,
-            config=config,
-            data_labels=config.data.aux,
-            log_extra={"retained": sorted(labels)})
-
-    barrier()
-
-    return model
+        run_elicitation(stage, model, config, data_labels=config.data.aux, retained=labels)
 
 
-def run_filtering(
-    stage: FilteringConfig,
-    config: ExperimentConfig,
-) -> None:
+def run_filtering(stage: FilteringConfig, config: ExperimentConfig) -> None:
     """Data-filtering stage: retrain from scratch on only the retained labels."""
 
-    logger = config.logger
-    labels = config.data.labels
+    for retained in get_retain_targets(stage, config):
 
-    logger.info("FILTERING START")
-
-    retain_targets = get_retain_targets(config.data.aux) # core & all core + 1 labels, less all labels
-    if stage.retain_targets is not None:
-        retain_targets = stage.retain_targets
-        logger.info(f"Using stage-level retain_targets override ({len(retain_targets)} targets)")
-
-    for retained in retain_targets:
-
-        removed = sorted(set(labels) - set(retained))
+        removed = sorted(set(config.data.labels) - set(retained))
         if not removed:
             continue
 
-        iter_name = labels_to_str(retained)
-
-        logger.info(f"Filtering: retaining {retained}, removing {removed}")
+        config.logger.info(f"Filtering: retaining {retained}, removing {removed}")
+        iter_stage = dataclasses.replace(stage, res_dir=stage.res_dir / labels_to_str(retained))
 
         set_seeds(stage.train.seed)
         model = make_model(BaseTransformer, stage.model, config)
-
-        iter_dir = stage.res_dir / iter_name
-        iter_stage = dataclasses.replace(stage, res_dir=iter_dir)
-
-        model = run_experiment(
-            stage=iter_stage,
-            model=model,
-            config=config,
-            func=do_train,
-            func_args={"train_labels": retained},
-            eval_configs=[{"log": {
-                "retained": sorted(retained),
-                "finetune": None,
-                "elicited": False
-            }}],
-        )
+        model = do_train(iter_stage, model, config, train_labels=retained)
+        do_eval(iter_stage, model, config, log=eval_log(sorted(retained)))
 
         if stage.eval.elicit:
+            run_elicitation(stage, model, config, data_labels=removed, retained=sorted(retained))
 
-            logger.info("FILTERING - ADVERSARIAL FT START")
-            run_elicitation(
-                stage=stage,
-                cur_dir=iter_dir,
-                model=model,
-                config=config,
-                data_labels=removed,
-                log_extra={"retained": sorted(retained)},
-            )
-
-        barrier()
+        del model
+        free_memory()
 
 
-def run_distill(
-    stage: DistillConfig,
-    config: ExperimentConfig,
-) -> None:
+def run_distill(stage: DistillConfig, config: ExperimentConfig) -> None:
     """Distillation stage: per retain target, train a fresh student on KL to a
     frozen teacher over only the retained data.
     """
 
-    logger = config.logger
-    labels = config.data.labels
+    for retained in get_retain_targets(stage, config):
 
-    logger.info("DISTILL START")
+        removed = sorted(set(config.data.labels) - set(retained))
 
-    retain_targets = get_retain_targets(config.data.aux)
-    if stage.retain_targets is not None:
-        retain_targets = stage.retain_targets
+        config.logger.info(f"Distill: retaining {retained}, removing {removed}")
+        iter_stage = dataclasses.replace(stage, res_dir=stage.res_dir / labels_to_str(retained))
 
-    teacher_dir = config.res_dir / stage.teacher
+        teacher, anti_teacher = load_teachers(stage, iter_stage, config, removed)
 
-    for retained in retain_targets:
-
-        removed = sorted(set(labels) - set(retained))
-        iter_name = labels_to_str(retained)
-
-        logger.info(f"Distill: retaining {retained}, removing {removed}")
-
-        iter_dir = stage.res_dir / iter_name
-        iter_stage = dataclasses.replace(stage, res_dir=iter_dir)
-
-        anti_teacher = None
-
-        if stage.teacher_type == "baseline":
-            teacher = load_model(teacher_dir, config, frozen=True)
-
-        elif stage.teacher_type == "filtering":
-            teacher = load_model(teacher_dir / iter_name, config, frozen=True)
-
-        elif stage.teacher_type == "difference":
-            logger.info(f"Distill: fine-tuning specialist on {removed}")
-            spec_stage = dataclasses.replace(
-                stage,
-                train=stage.specialist,
-                eval=dataclasses.replace(stage.eval, num_train_evals=0),
-                res_dir=iter_dir / "specialist",
-            )
-            specialist = load_model(teacher_dir, config)
-            specialist = do_train(spec_stage, specialist, config, train_labels=removed)
-            del specialist
-            torch.cuda.empty_cache()
-
-            teacher = load_model(teacher_dir, config, frozen=True)
-            anti_teacher = load_model(spec_stage.res_dir, config, frozen=True)
-
-        else:
-            raise ValueError(f"Unknown teacher_type: {stage.teacher_type}")
-
+        set_seeds(stage.train.seed)
         model = make_model(BaseTransformer, stage.model, config)
-
-        model = run_experiment(
-            stage=iter_stage,
-            model=model,
-            config=config,
-            func=do_distill,
-            func_args={
-                "train_labels": retained,
-                "teacher": teacher,
-                "anti_teacher": anti_teacher,
-                },
-            eval_configs=[{"log": {
-                "retained": sorted(retained),
-                "finetune": None,
-                "elicited": False
-            }}],
-        )
+        model = do_distill(iter_stage, model, config, train_labels=retained, teacher=teacher, anti_teacher=anti_teacher)
+        do_eval(iter_stage, model, config, log=eval_log(sorted(retained)))
 
         del teacher, anti_teacher
-        gc.collect()
-        torch.cuda.empty_cache()
+        free_memory()
 
         if stage.eval.elicit and removed:
-            logger.info("DISTILL - ADVERSARIAL FT START")
-            run_elicitation(
-                stage=stage,
-                cur_dir=iter_dir,
-                model=model,
-                config=config,
-                data_labels=removed,
-                log_extra={"retained": sorted(retained)},
-            )
+            run_elicitation(stage, model, config, data_labels=removed, retained=sorted(retained))
 
         del model
-        torch.cuda.empty_cache()
-        barrier()
+        free_memory()
 
-    gc.collect()
-    torch.cuda.empty_cache()
+
+def run_routing(stage: RoutingConfig, config: ExperimentConfig) -> None:
+    """Train GR-MLP, evaluate each expert configuration, and elicit core only."""
+
+    assert stage.model.arch == "moe", "RoutingConfig currently supports GR-MLP (moe)"
+    labels = config.data.labels
+
+    set_seeds(stage.train.seed)
+    model = make_model(MoETransformer, stage.model, config, extra_args={"labels": labels})
+    model = do_routing(stage, model, config)
+    for experts in expert_configurations(labels):
+        do_eval(stage, model, config, expert_labels=experts, log=eval_log(experts))
+
+    if stage.eval.elicit:
+        run_elicitation(
+            stage, model, config,
+            data_labels=config.data.aux,
+            retained=["core"],
+            expert_labels=["core"],
+        )
+
 
 # ---------------------------------------------------------------------------
 # Pipeline dispatcher
 # ---------------------------------------------------------------------------
-
-def run_routing(stage: RoutingConfig, config: ExperimentConfig) -> None:
-    """Train GR-MLP, evaluate each expert configuration, and elicit core only."""
-    assert stage.model.arch == "moe", "RoutingConfig currently supports GR-MLP (moe)"
-    set_seeds(stage.train.seed)
-    model = make_model(
-        MoETransformer, stage.model, config,
-        extra_args={"labels": config.data.labels},
-    )
-    model = run_experiment(
-        stage=stage,
-        model=model,
-        config=config,
-        func=do_routing,
-        eval_configs=[{
-            "expert_labels": experts,
-            "log": {"retained": experts, "finetune": None, "elicited": False},
-        } for experts in expert_configurations(config.data.labels)],
-    )
-    if stage.eval.elicit:
-        run_elicitation(
-            stage=stage,
-            cur_dir=stage.res_dir,
-            model=model,
-            config=config,
-            data_labels=config.data.aux,
-            expert_labels=["core"],
-            log_extra={"retained": ["core"]},
-        )
-    del model
-    torch.cuda.empty_cache()
-    barrier()
-
 
 RUNNERS = {
     BaselineConfig: run_baseline,
@@ -423,17 +271,17 @@ def run_experiments(config: ExperimentConfig) -> None:
         runner = RUNNERS[type(stage)]
         runner(stage, config)
 
+        free_memory()
+        barrier()
 
-def run(config: ExperimentConfig):
+
+def run(config: ExperimentConfig) -> None:
     """Run the pretraining experiment pipeline.
 
     Args:
         config: An ExperimentConfig instance.
-
-    Returns:
-        DataFrame of eval stats (empty if no stats were written).
     """
-    
+
     try:
         config = setup(config)
 
@@ -448,4 +296,3 @@ def run(config: ExperimentConfig):
         barrier()
         torch._dynamo.reset()
         torch.cuda.empty_cache()
-

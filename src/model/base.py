@@ -89,19 +89,12 @@ class BaseTransformer(QwenTransformer):
         self,
         tokens: torch.Tensor,
         targets: Optional[torch.Tensor] = None,
-        stop_at_layer: int | None = None,
     ) -> Tuple[torch.Tensor, Optional[torch.Tensor]]:
         """
-        tokens:        (B, T) token ids
-        targets:       (B, T) next-token ids, -1000 = ignored; None for no loss
-        stop_at_layer: return the residual stream (B, T, E) after this block instead of logits
-                       (runs the full stack; block ``i``'s output is HF ``hidden_states[i + 1]``)
-        returns:       (logits (B, T, V) or activations (B, T, E), loss scalar or None)
+        tokens:  (B, T) token ids
+        targets: (B, T) next-token ids, -1000 = ignored; None for no loss
+        returns: (logits (B, T, V), loss scalar or None)
         """
-        if stop_at_layer is not None:
-            out = self.hf.model(input_ids=tokens, output_hidden_states=True)
-            return out.hidden_states[stop_at_layer + 1], None
-
         logits = self.hf(input_ids=tokens).logits # (B, T, V)
         loss = self.loss_fn(logits, targets) if targets is not None else None
         return logits, loss

@@ -10,12 +10,33 @@ from src.model.config import ModelConfig, RoutedModelConfig, model_config
 from src.model.moe import MoETransformer
 from src.run.experiment.config import trinity_train_config
 from src.run.train.base import BaselineConfig, make_scheduler
-from src.run.train.optim import PretrainingOptimizer
+from src.run.train.optim import PretrainingOptimizer, adamw_betas
 from src.run.train.routing import RoutingConfig, do_routing, routing_masks
 from src.run.util.config import DataConfig, EvalConfig, ExperimentConfig, TrainConfig
 
 
 class PretrainingOptimizerTests(unittest.TestCase):
+    def test_porian_betas(self):
+        # Reproduce both sides of Table 4 at the paper's sequence length.
+        for sequences in (20, 64, 128, 192):
+            self.assertEqual(adamw_betas(sequences * 2048), (0.9, 0.99))
+        for sequences in (256, 320, 640):
+            self.assertEqual(adamw_betas(sequences * 2048), (0.9, 0.95))
+        self.assertEqual(adamw_betas(256 * 2048 - 1), (0.9, 0.99))
+        with self.assertRaises(ValueError):
+            adamw_betas(0)
+
+    def test_optimizer_betas_include_accumulation_and_ranks(self):
+        cfg = RoutedModelConfig.from_base(ModelConfig(
+            vocab_size=32, embed_dim=16, num_layers=1, num_heads=2,
+            num_key_value=1, head_dim=8, mlp_dim=128, ctx_len=8,
+        ), arch="moe", core_param_prc=.5, aux_param_prc=.5)
+        model = MoETransformer(cfg, ["core", "aux"], dtype=torch.float32)
+        for ranks, accumulation, beta2 in ((1, 16, .99), (2, 16, .95), (1, 32, .95)):
+            with patch("src.run.train.optim.get_world_size", return_value=ranks):
+                optimizer = PretrainingOptimizer(model, TrainConfig(bs=16, acc_steps=accumulation, ctx_len=1024))
+            self.assertEqual(optimizer.optimizers[1].param_groups[0]["betas"], (.9, beta2))
+
     def test_preset_scaling(self):
         for size, batch, lr in (("25M", 128, 6.75e-4), ("50M", 256, None), ("100M", 512, 4.5e-4)):
             train = trinity_train_config(model_config(size), world_size=2)
@@ -24,8 +45,9 @@ class PretrainingOptimizerTests(unittest.TestCase):
             self.assertEqual(train.muon_lr, 1e-3)
             self.assertEqual(train.warmup_steps, 2000)
             self.assertEqual(train.min_lr_ratio, 0.0)
+            self.assertEqual(adamw_betas(train.bs * train.acc_steps * 2 * train.ctx_len), (.9, .99))
             if lr is not None:
-                self.assertAlmostEqual(train.lr, lr)
+                self.assertAlmostEqual(train.adamw_lr, lr)
 
     def test_wsd_boundaries_and_short_runs(self):
         for steps in (1, 2, 100):
@@ -55,7 +77,7 @@ class PretrainingOptimizerTests(unittest.TestCase):
             num_key_value=1, head_dim=8, mlp_dim=128, ctx_len=8,
         ), arch="moe", core_param_prc=.5, aux_param_prc=.5)
         model = MoETransformer(cfg, ["core", "aux"], dtype=torch.bfloat16)
-        train = TrainConfig(lr=6.75e-4, muon_lr=1e-3)
+        train = TrainConfig(adamw_lr=6.75e-4, muon_lr=1e-3)
         optimizer = PretrainingOptimizer(model, train)
         self.assertEqual(sum(u.master.numel() for u in optimizer.updates), sum(p.numel() for p in model.parameters()))
         self.assertTrue(all(u.master.dtype == torch.float32 for u in optimizer.updates))
@@ -65,7 +87,8 @@ class PretrainingOptimizerTests(unittest.TestCase):
         # Populate core momentum before an auxiliary-only optimizer step.
         masks = routing_masks(torch.zeros(2, dtype=torch.long), 2)
         model(tokens, targets=tokens, **masks)[1].backward()
-        optimizer.step(torch.tensor([1, 0]))
+        optimizer.observe(torch.tensor([0]))
+        optimizer.step()
         optimizer.zero_grad()
         before = [u.master.detach().clone() for u in optimizer.updates]
         momentum = {
@@ -76,7 +99,8 @@ class PretrainingOptimizerTests(unittest.TestCase):
         masks = routing_masks(torch.ones(2, dtype=torch.long), 2)
         model(tokens, targets=tokens, **masks)[1].backward()
         self.assertTrue(all(p.grad is not None and p.grad.count_nonzero() == 0 for name, p in model.named_parameters() if ".mlp." not in name))
-        optimizer.step(torch.tensor([0, 1]))
+        optimizer.observe(torch.tensor([1]))
+        optimizer.step()
         aux_changed = False
         for u, previous in zip(optimizer.updates, before):
             if u.expert == 0:
@@ -106,7 +130,8 @@ class PretrainingOptimizerTests(unittest.TestCase):
                 opt = torch.optim.Muon([p], lr=train.muon_lr, weight_decay=train.weight_decay, adjust_lr_fn="original")
                 opt.step()
                 references.append((u, p))
-        optimizer.step(torch.tensor([1, 1]))
+        optimizer.observe(torch.tensor([0, 1]))
+        optimizer.step()
         for u, p in references:
             torch.testing.assert_close(u.master, p)
             torch.testing.assert_close(u.source[u.index], p)
@@ -158,7 +183,8 @@ class PretrainingOptimizerTests(unittest.TestCase):
         calls = []
         model.register_forward_pre_hook(lambda module, args, kwargs: calls.append(kwargs["tokens"].shape), with_kwargs=True)
         stage = RoutingConfig(model=cfg, train=TrainConfig(bs=3, ctx_len=8), eval=EvalConfig(num_train_evals=0))
-        config = ExperimentConfig(device=torch.device("cpu"), data=DataConfig(aux=["a", "b"]))
+        config = ExperimentConfig(data=DataConfig(aux=["a", "b"]))
+        config.device = torch.device("cpu")
         with patch("src.run.train.base.make_loader", return_value=Loader()), patch("src.run.train.base.save_model"), patch("src.run.train.base.save_losses"):
             do_routing(stage, model, config)
         self.assertEqual(calls, [torch.Size([3, 8]), torch.Size([3, 8])])

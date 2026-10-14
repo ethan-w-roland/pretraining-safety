@@ -18,15 +18,17 @@ import dataclasses
 import logging
 from copy import deepcopy
 from pathlib import Path
-from typing import TYPE_CHECKING, Optional
+from typing import TYPE_CHECKING, Iterable, Optional
 import torch
 
 from src.model.base import BaseTransformer
-from src.model.config import ROUTED_ARCHS, ModelConfig, Transformer
+from src.model.config import ModelConfig, Transformer
+from src.model.routed import RoutedTransformer
 from src.run.util.distributed import (
     get_local_rank,
     get_raw_model,
     barrier,
+    is_distributed,
     is_main_process,
     DDP,
 )
@@ -51,7 +53,7 @@ def prepare_model(
         run_config.logger.info(f"Compiling {type(model).__name__} with torch.compile...")
         model = torch.compile(model, dynamic=True)
 
-    if run_config.is_ddp:
+    if is_distributed():
         barrier()
         local_rank = get_local_rank()
         model = DDP(
@@ -97,11 +99,7 @@ def save_model(res_dir: Path, model: Transformer) -> None:
 
     if is_main_process():
         raw_model = get_raw_model(model)
-        model_config = {
-            f.name: getattr(raw_model.config, f.name)
-            for f in dataclasses.fields(raw_model.config)
-            if f.name != "tokenizer"
-        }
+        model_config = dataclasses.asdict(raw_model.config)
         res_dir.mkdir(parents=True, exist_ok=True)
         torch.save({"model": raw_model.state_dict(), "config": model_config}, str(res_dir / "checkpoint.pth"))
     barrier()
@@ -137,6 +135,28 @@ def load_model(
     return model
 
 
+def expert_kwargs(model: Transformer, expert_labels: Optional[Iterable[str]]) -> dict:
+    """Forward kwargs that run a routed model with only ``expert_labels`` active
+    (all experts if None); ``{}`` for a dense model.
+
+    The same mask is used forward and backward, at every position.
+    """
+
+    raw_model = get_raw_model(model)
+    if not isinstance(raw_model, RoutedTransformer):
+        return {}
+
+    labels = raw_model.labels
+    mask = torch.ones(len(labels), dtype=torch.bool)
+    if expert_labels is not None:
+        mask[:] = False
+        for label in expert_labels:
+            assert label in labels, f"Unknown expert label {label!r} not in {labels}"
+            mask[labels.index(label)] = True
+    mask = mask.to(next(raw_model.parameters()).device)
+    return {"fwd_mask": mask, "bck_mask": mask}
+
+
 def log_model_params(
     model: Transformer,
     logger: logging.Logger,
@@ -151,7 +171,7 @@ def log_model_params(
     num_params = sum(p.numel() for p in model.parameters())
     logger.info(f"Initialized {model_type} with {num_params:,} total parameters")
 
-    if model.config.arch in ROUTED_ARCHS:
+    if isinstance(model, RoutedTransformer):
         for label in model.labels:
             num_params = sum(p.numel() for p in model.get_params(label))
             logger.info(f"  Label '{label}' has {num_params:,} parameters")

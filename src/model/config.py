@@ -1,16 +1,13 @@
 import dataclasses
 from dataclasses import dataclass
-from transformers import AutoTokenizer
 from torch import nn
 from typing import Literal
-from src.run.util.tools import json_safe
 
 @dataclass
 class ModelConfig:
     """Qwen3 dense architecture (``src.model.base`` maps this onto ``transformers.Qwen3Config``)."""
 
     arch: str = "base"
-    tokenizer: AutoTokenizer | None = None # set at run setup from the dataset metadata
     tokenizer_name: str | None = None # HF tokenizer the config is sized for (checked against the dataset's)
     ctx_len: int = 1024
     vocab_size: int = 50304
@@ -131,9 +128,6 @@ def model_config(size: str, **overrides) -> ModelConfig:
     if size not in MODEL_SIZES:
         raise KeyError(f"unknown model size {size!r}; supported: {list(MODEL_SIZES)}")
     return dataclasses.replace(MODEL_SIZES[size], **overrides)
-
-
-ROUTED_ARCHS = ("moe", "lora")
 
 
 @dataclass

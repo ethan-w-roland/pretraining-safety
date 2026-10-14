@@ -22,13 +22,15 @@ import torch
 from typing import Any, Iterable, Optional
 from tqdm.auto import tqdm
 
-from src.model.config import ROUTED_ARCHS, Transformer
+from src.model.config import Transformer
+from src.model.utils import expert_kwargs
 from src.run.eval import eval_loss
+from src.run.train.optim import adamw_betas
 from src.run.util.config import ExperimentConfig, StageConfig
 from src.run.util.data import make_loader
-from src.run.util.tools import get_exp_mask, log_line, json_safe
+from src.run.util.tools import log_line, json_safe
 from src.run.util.logger import get_tqdm_kwargs
-from src.run.util.distributed import barrier, get_raw_model, get_world_size, is_main_process
+from src.run.util.distributed import barrier, get_world_size, is_distributed, is_main_process
 
 
 def do_elicit(
@@ -53,8 +55,7 @@ def do_elicit(
     logger = config.logger
     labels = config.data.labels
     log_fp = config.res_dir / "stats.jsonl"
-    is_ddp = config.is_ddp
-    lr = stage.train.lr / 4 # heuristic
+    lr = stage.train.adamw_lr / 4 # heuristic
     bs = stage.train.bs
     data_labels = list(data_labels)
 
@@ -63,11 +64,8 @@ def do_elicit(
 
     assert all(label in labels for label in data_labels), f"all data labels must be in {labels}"
 
-    raw_model = get_raw_model(model)
-    is_routed = raw_model.config.arch in ROUTED_ARCHS
+    experts = expert_kwargs(model, expert_labels)
     model.train()
-
-    opt = torch.optim.AdamW(model.parameters(), lr=lr, fused=True)
 
     # each rank's share of the loader is disjoint, so together the ranks hold
     # num_seq distinct seqs; these same seqs are reused every round
@@ -75,6 +73,10 @@ def do_elicit(
     assert num_micro_batches > 0, f"num_seq {num_seq} < bs {bs} x world size {get_world_size()}"
     loader = make_loader(config, stage, data_labels, "train", balance=True)
     micro_batches = [(x, y) for _, x, y in itertools.islice(loader, num_micro_batches)]
+
+    # One optimizer step accumulates this whole set across all ranks each round.
+    batch_tokens = sum(x.numel() for x, _ in micro_batches) * get_world_size()
+    opt = torch.optim.AdamW(model.parameters(), lr=lr, betas=adamw_betas(batch_tokens), fused=True)
 
     logger.debug(f"{num_micro_batches} micro-batches of {bs} seqs per rank")
 
@@ -88,16 +90,10 @@ def do_elicit(
         for batch_idx, (x, y) in enumerate(micro_batches):
 
             is_last = batch_idx == num_micro_batches - 1
-            no_sync_ctx = model.no_sync() if (is_ddp and not is_last) else contextlib.nullcontext()
+            no_sync_ctx = model.no_sync() if (is_distributed() and not is_last) else contextlib.nullcontext()
 
             with no_sync_ctx:
-                if is_routed:
-                    fwd_mask = get_exp_mask(labels, expert_labels, device=x.device)
-                    bck_mask = get_exp_mask(labels, expert_labels, device=x.device)
-                    loss = model(x, targets=y, fwd_mask=fwd_mask, bck_mask=bck_mask)[1]
-                else:
-                    loss = model(x, targets=y)[1]
-
+                loss = model(tokens=x, targets=y, **experts)[1]
                 (loss / num_micro_batches).backward()
 
             pbar.set_description(f"Round {round_idx} | Batch {batch_idx + 1}/{num_micro_batches} | L {loss.item():.4f}")

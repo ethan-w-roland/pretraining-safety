@@ -15,7 +15,7 @@ import pickle
 from dataclasses import is_dataclass
 from datetime import datetime
 from pathlib import Path
-from typing import Iterable, Optional
+from typing import Iterable
 
 import numpy as np
 import torch
@@ -97,24 +97,3 @@ def split_batch(batch: torch.Tensor, device: torch.device) -> tuple[torch.Tensor
     """Move a ``(B, T+1)`` token batch to ``device`` as inputs and next-token targets."""
     batch = batch.to(device, non_blocking=True)
     return batch[:, :-1], batch[:, 1:]
-
-
-def get_exp_mask(
-    labels: list[str],
-    selected_labels: Optional[Iterable[str]],
-    device: torch.device,
-) -> torch.Tensor:
-    """Create a boolean expert selection mask of length len(labels)."""
-    K = len(labels)
-    mask = torch.zeros(K, device=device, dtype=torch.bool)
-
-    if selected_labels is None:
-        mask[:] = True
-    else:
-        label_set = set(labels)
-        for e in selected_labels:
-            assert e in label_set, f"Unknown expert label '{e}' not in {labels}"
-            mask[labels.index(e)] = True
-
-    return mask
-

@@ -106,7 +106,7 @@ def trinity_train_config(
     assert per_rank_batch % micro_batch == 0
     adam_lr = max(2e-4, 3e-4 * (1024 / model.embed_dim) ** (math.log(1.5) / math.log(2)))
     return TrainConfig(
-        lr=adam_lr,
+        adamw_lr=adam_lr,
         muon_lr=1e-3,
         muon_momentum=0.95,
         muon_ns_steps=5,
