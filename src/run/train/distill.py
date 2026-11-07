@@ -27,12 +27,19 @@ from src.run.util.distributed import get_raw_model
 
 @dataclass
 class DistillConfig(StageConfig):
-    """Train a fresh student per retain target on KL to a frozen teacher."""
+    """Train a fresh student per retain target on KL to a frozen teacher.
+
+    ``retain_targets`` are the students' training data. ``forget`` are the
+    labels the teacher is cleaned of: the ``filtering`` teacher is the one
+    retrained without them, and the ``difference`` anti-teacher is fine-tuned
+    on them. ``forget=None`` uses the labels each retain target removes.
+    """
     name: str = "distill"
     retain_targets: list[list[str]] | None = None
+    forget: list[str] | None = None
     teacher: str = "" # name of the earlier stage whose checkpoint is the teacher
     teacher_type: Literal["baseline", "filtering", "difference"] = "baseline"
-    specialist: TrainConfig = field(default_factory=TrainConfig) # "difference" only: fine-tuning the teacher on the removed labels
+    specialist: TrainConfig = field(default_factory=TrainConfig) # "difference" only: fine-tuning the teacher on the forget labels
     alpha: float = 1.0
     temperature: float = 1.0
 

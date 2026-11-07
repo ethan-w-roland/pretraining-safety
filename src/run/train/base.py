@@ -179,7 +179,7 @@ def train_loop(
             is_last_acc = acc_idx == acc_steps - 1
             no_sync_ctx = model.no_sync() if (is_distributed() and not is_last_acc) else contextlib.nullcontext()
             with no_sync_ctx:
-                loss = loss_fn(labels, x, y)
+                loss = loss_fn(labels, x, y) # includes model forward
                 (loss / acc_steps).backward()
             opt.observe(labels)
 

@@ -113,15 +113,15 @@ def run_elicitation(
 
 def load_teachers(
     stage: DistillConfig,
-    iter_stage: DistillConfig,
     config: ExperimentConfig,
-    removed: list[str],
+    forget: list[str],
 ) -> tuple[Transformer, Transformer | None]:
-    """Frozen ``(teacher, anti_teacher)`` for one retain target of a distill stage.
+    """Frozen ``(teacher, anti_teacher)`` for a distill stage cleaning ``forget``.
 
     ``baseline``: the teacher stage's model. ``filtering``: the teacher stage's
-    model for the same retain target. ``difference``: the teacher stage's model,
-    with an anti-teacher fine-tuned from it on the ``removed`` labels.
+    model retrained without ``forget``. ``difference``: the teacher stage's
+    model, with an anti-teacher fine-tuned from it on ``forget`` (once per
+    stage and forget set, then reused by every retain target).
     """
 
     teacher_dir = config.res_dir / stage.teacher
@@ -129,22 +129,27 @@ def load_teachers(
     if stage.teacher_type == "baseline":
         return load_model(teacher_dir, config, frozen=True), None
 
+    assert forget, f"{stage.teacher_type} teacher needs labels to forget"
+    teacher_retained = labels_to_str(set(config.data.labels) - set(forget))
+
     if stage.teacher_type == "filtering":
-        return load_model(teacher_dir / iter_stage.res_dir.name, config, frozen=True), None
+        return load_model(teacher_dir / teacher_retained, config, frozen=True), None
 
     if stage.teacher_type == "difference":
-        config.logger.info(f"Distill: fine-tuning specialist on {removed}")
-        spec_stage = dataclasses.replace(
-            stage,
-            train=stage.specialist,
-            eval=dataclasses.replace(stage.eval, num_train_evals=0),
-            res_dir=iter_stage.res_dir / "specialist",
-        )
-        specialist = load_model(teacher_dir, config)
-        do_train(spec_stage, specialist, config, train_labels=removed)
-        del specialist
-        free_memory()
-        return load_model(teacher_dir, config, frozen=True), load_model(spec_stage.res_dir, config, frozen=True)
+        spec_dir = stage.res_dir / "specialist" / labels_to_str(forget)
+        if not (spec_dir / "checkpoint.pth").exists():
+            config.logger.info(f"Distill: fine-tuning specialist on {forget}")
+            spec_stage = dataclasses.replace(
+                stage,
+                train=stage.specialist,
+                eval=dataclasses.replace(stage.eval, num_train_evals=0),
+                res_dir=spec_dir,
+            )
+            specialist = load_model(teacher_dir, config)
+            do_train(spec_stage, specialist, config, train_labels=forget)
+            del specialist
+            free_memory()
+        return load_model(teacher_dir, config, frozen=True), load_model(spec_dir, config, frozen=True)
 
     raise ValueError(f"Unknown teacher_type: {stage.teacher_type}")
 
@@ -199,11 +204,12 @@ def run_distill(stage: DistillConfig, config: ExperimentConfig) -> None:
     for retained in get_retain_targets(stage, config):
 
         removed = sorted(set(config.data.labels) - set(retained))
+        forget = sorted(stage.forget) if stage.forget is not None else removed
 
-        config.logger.info(f"Distill: retaining {retained}, removing {removed}")
+        config.logger.info(f"Distill: retaining {retained}, removing {removed}, teacher forgets {forget}")
         iter_stage = dataclasses.replace(stage, res_dir=stage.res_dir / labels_to_str(retained))
 
-        teacher, anti_teacher = load_teachers(stage, iter_stage, config, removed)
+        teacher, anti_teacher = load_teachers(stage, config, forget)
 
         set_seeds(stage.train.seed)
         model = make_model(BaseTransformer, stage.model, config)
@@ -213,8 +219,8 @@ def run_distill(stage: DistillConfig, config: ExperimentConfig) -> None:
         del teacher, anti_teacher
         free_memory()
 
-        if stage.eval.elicit and removed:
-            run_elicitation(stage, model, config, data_labels=removed, retained=sorted(retained))
+        if stage.eval.elicit and forget:
+            run_elicitation(stage, model, config, data_labels=forget, retained=sorted(retained))
 
         del model
         free_memory()

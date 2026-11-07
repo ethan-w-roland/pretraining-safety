@@ -28,6 +28,7 @@ def make_config(seed: int, tokens_per_param: int = 20) -> ExperimentConfig:
     config = GetStoriesConfig(num_aux=1)
     FORGET = config.data.aux[0]
     RETAIN = [["core"]] # "core" is the merged label of all core topics
+    STUDENT_DATA = [["core"], ["core", FORGET]] # every student is distilled on the filtered and the full data
     metadata = json.load(open(config.data.dirs[0] / "metadata.json"))
 
     # pretraining stages get tokens_per_param tokens per parameter; 20 is Chinchilla-optimal
@@ -84,20 +85,12 @@ def make_config(seed: int, tokens_per_param: int = 20) -> ExperimentConfig:
             retain_targets=RETAIN,
         ),
         DistillConfig(
-            name="distill_all_25m",
-            model=M25,
-            train=train_25m,
-            eval=elicit,
-            retain_targets=[["core", FORGET]],
-            teacher="base_50m",
-            teacher_type="baseline",
-        ),
-        DistillConfig(
             name="distill_base_25m",
             model=M25,
             train=train_25m,
             eval=elicit,
-            retain_targets=RETAIN,
+            retain_targets=STUDENT_DATA,
+            forget=[FORGET],
             teacher="base_50m",
             teacher_type="baseline",
         ),
@@ -106,7 +99,8 @@ def make_config(seed: int, tokens_per_param: int = 20) -> ExperimentConfig:
             model=M25,
             train=train_25m,
             eval=elicit,
-            retain_targets=RETAIN,
+            retain_targets=STUDENT_DATA,
+            forget=[FORGET],
             teacher="filter_50m",
             teacher_type="filtering",
         ),
@@ -115,7 +109,8 @@ def make_config(seed: int, tokens_per_param: int = 20) -> ExperimentConfig:
             model=M25,
             train=train_25m,
             eval=elicit,
-            retain_targets=RETAIN,
+            retain_targets=STUDENT_DATA,
+            forget=[FORGET],
             teacher="base_50m",
             teacher_type="difference",
             specialist=specialist,
